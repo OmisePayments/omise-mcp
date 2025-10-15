@@ -432,16 +432,17 @@ export class LinkTools {
     averagePaymentAmount: number;
     totalRevenue: number;
   } {
-    const totalViews = link.used || 0;
-    const conversionRate = totalViews > 0 ? (link.charges?.length || 0) / totalViews : 0;
+    const totalViews = typeof link.used === 'number' ? link.used : 0;
+    const chargesData = link.charges?.data || [];
+    const conversionRate = totalViews > 0 ? chargesData.length / totalViews : 0;
     
     let totalRevenue = 0;
-    if (link.charges && link.charges.length > 0) {
-      totalRevenue = link.charges.reduce((sum, charge) => sum + charge.amount, 0);
+    if (chargesData.length > 0) {
+      totalRevenue = chargesData.reduce((sum, charge) => sum + charge.amount, 0);
     }
     
-    const averagePaymentAmount = link.charges && link.charges.length > 0 
-      ? totalRevenue / link.charges.length 
+    const averagePaymentAmount = chargesData.length > 0 
+      ? totalRevenue / chargesData.length 
       : 0;
 
     return {
@@ -524,7 +525,8 @@ export class LinkTools {
         params.tax_inclusive || false
       );
 
-      const linkParams: CreateLinkRequest = {
+      // Note: Using 'any' because the actual Omise API supports more fields than the type definition
+      const linkParams: any = {
         amount: params.amount,
         currency: params.currency.toUpperCase(),
         title: params.title,

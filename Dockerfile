@@ -17,8 +17,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# 依存関係のインストール（本番用のみ）
-RUN npm ci --only=production && npm cache clean --force
+# 依存関係のインストール（ビルドに必要な全ての依存関係）
+RUN npm install && npm cache clean --force
 
 # ソースコードのコピー
 COPY src/ ./src/

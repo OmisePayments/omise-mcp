@@ -17,7 +17,8 @@ import {
   SecurityPolicy,
   AuditLogEntry,
   RateLimitInfo,
-  HealthCheckResult
+  HealthCheckResult,
+  AgentCertificate
 } from '../types/auth';
 
 export class A2AAuthService {
@@ -139,7 +140,7 @@ export class A2AAuthService {
         success: true,
         agentId: oauthClient.clientId,
         clientSecret: oauthClient.clientSecret,
-        certificate: agentCertificate,
+        certificate: agentCertificate || undefined,
         oauthConfig: {
           authorizationEndpoint: this.config.baseUrl + '/oauth/authorize',
           tokenEndpoint: this.config.baseUrl + '/oauth/token',
@@ -216,7 +217,7 @@ export class A2AAuthService {
       };
 
       this.logger.info('Agent authenticated successfully', {
-        agentId,
+        agentId: agentIdentity.clientId,
         securityLevel,
         scopes: agentIdentity.scopes
       });
@@ -556,7 +557,7 @@ export class A2AAuthService {
   /**
    * Log audit event
    */
-  private logAuditEvent(event: Omit<AuditLogEntry, 'id' | 'timestamp'>): void {
+  private logAuditEvent(event: Omit<AuditLogEntry, 'id' | 'timestamp' | 'ipAddress' | 'userAgent'> & Partial<Pick<AuditLogEntry, 'ipAddress' | 'userAgent'>>): void {
     if (!this.securityPolicy.auditLogging) {
       return;
     }
@@ -564,6 +565,8 @@ export class A2AAuthService {
     const auditEntry: AuditLogEntry = {
       id: this.generateAuditId(),
       timestamp: new Date(),
+      ipAddress: event.ipAddress || 'internal',
+      userAgent: event.userAgent || 'A2A-Service/1.0',
       ...event
     };
 

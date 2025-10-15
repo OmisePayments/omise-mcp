@@ -376,8 +376,9 @@ export class ScheduleTools {
       'year': 1
     };
     
-    if (every > maxIntervals[period]) {
-      return { valid: false, error: `Invalid interval for ${period} period. Maximum: ${maxIntervals[period]}` };
+    const maxInterval = maxIntervals[period];
+    if (maxInterval && every > maxInterval) {
+      return { valid: false, error: `Invalid interval for ${period} period. Maximum: ${maxInterval}` };
     }
     
     return { valid: true };
