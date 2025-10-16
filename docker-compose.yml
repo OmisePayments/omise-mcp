@@ -1,5 +1,4 @@
 # Omise MCP Server Development Environment
-# version: '3.8'
 
 services:
   # ============================================================================
@@ -16,7 +15,7 @@ services:
     stdin_open: true  # Keep stdin open for MCP stdio server
     tty: true         # Allocate pseudo-TTY
     ports:
-      - "8000:8000"
+      - "3000:3000"
     env_file:
       - config/development.env
     environment:
