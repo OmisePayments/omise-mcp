@@ -40,16 +40,16 @@
 
 | Category | Features | Tool Count | Documentation |
 |---------|----------|------------|---------------|
-| **Payment** | Charges, Tokens, Sources | 8 | [Omise Charges API](https://www.omise.co/charges-api) |
-| **Customer** | Customer & Card Management | 7 | [Omise Customers API](https://www.omise.co/customers-api) |
-| **Transfer** | Transfer & Recipient Management | 6 | [Omise Transfers API](https://www.omise.co/transfers-api) |
+| **Payment** | Charges (7), Tokens (2), Sources (2) | 11 | [Omise Charges API](https://www.omise.co/charges-api) |
+| **Customer** | Customer & Card Management | 9 | [Omise Customers API](https://www.omise.co/customers-api) |
+| **Transfer** | Transfers (5) & Recipients (6) | 11 | [Omise Transfers API](https://www.omise.co/transfers-api) |
 | **Refund** | Refund Processing | 3 | [Omise Refunds API](https://www.omise.co/refunds-api) |
-| **Dispute** | Chargeback Processing | 7 | [Omise Disputes API](https://www.omise.co/disputes-api) |
+| **Dispute** | Chargeback & Document Management | 8 | [Omise Disputes API](https://www.omise.co/disputes-api) |
 | **Schedule** | Recurring Payments | 5 | [Omise Schedules API](https://www.omise.co/schedules-api) |
 | **Event** | Event Management | 2 | [Omise Events API](https://www.omise.co/events-api) |
 | **Capability** | Feature Verification | 1 | [Omise Capabilities API](https://www.omise.co/capabilities-api) |
 
-**Total: ~45 tools** covering all active Omise Core API functionality
+**Total: 50 tools** covering all active Omise Core API functionality
 
 ## 🛠️ Technology Stack
 
