@@ -319,13 +319,19 @@ export class WebhookTools {
     try {
       const startTime = Date.now();
       
+      // Note: fetch doesn't support timeout natively, use AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
       const response = await fetch(url, {
         method: 'HEAD',
-        timeout: 5000,
+        signal: controller.signal,
         headers: {
           'User-Agent': 'Omise-Webhook-Health-Check/1.0'
         }
       });
+      
+      clearTimeout(timeoutId);
       
       const responseTime = Date.now() - startTime;
       

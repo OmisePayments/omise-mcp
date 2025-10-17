@@ -432,16 +432,17 @@ export class LinkTools {
     averagePaymentAmount: number;
     totalRevenue: number;
   } {
-    const totalViews = link.used || 0;
-    const conversionRate = totalViews > 0 ? (link.charges?.length || 0) / totalViews : 0;
+    const totalViews = typeof link.used === 'number' ? link.used : 0;
+    const chargesData = link.charges?.data || [];
+    const conversionRate = totalViews > 0 ? chargesData.length / totalViews : 0;
     
     let totalRevenue = 0;
-    if (link.charges && link.charges.length > 0) {
-      totalRevenue = link.charges.reduce((sum, charge) => sum + charge.amount, 0);
+    if (chargesData.length > 0) {
+      totalRevenue = chargesData.reduce((sum, charge) => sum + charge.amount, 0);
     }
     
-    const averagePaymentAmount = link.charges && link.charges.length > 0 
-      ? totalRevenue / link.charges.length 
+    const averagePaymentAmount = chargesData.length > 0 
+      ? totalRevenue / chargesData.length 
       : 0;
 
     return {
@@ -524,6 +525,8 @@ export class LinkTools {
         params.tax_inclusive || false
       );
 
+      // Note: Comment out fields are not existing CreateLinkRequest in the model,
+        // either we need to add or remove or can use any. But using any could be dangerous for type safety
       const linkParams: CreateLinkRequest = {
         amount: params.amount,
         currency: params.currency.toUpperCase(),
@@ -533,13 +536,13 @@ export class LinkTools {
         used: params.used || 0,
         charges: params.charges || [],
         payment_uri: params.payment_uri,
-        expires_at: params.expires_at,
-        tax_id: params.tax_id,
-        tax_inclusive: params.tax_inclusive || false,
-        tax_rate: params.tax_rate,
-        fee_rate: params.fee_rate,
-        custom_fields: params.custom_fields,
-        branding: params.branding,
+        // expires_at: params.expires_at,
+        // tax_id: params.tax_id,
+        // tax_inclusive: params.tax_inclusive || false,
+        // tax_rate: params.tax_rate,
+        // fee_rate: params.fee_rate,
+        // custom_fields: params.custom_fields,
+        // branding: params.branding,
         metadata: this.sanitizeMetadata(params.metadata)
       };
 

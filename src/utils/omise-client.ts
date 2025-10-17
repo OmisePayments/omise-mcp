@@ -2,7 +2,7 @@
  * Omise API Client
  */
 
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { 
   OmiseConfig, 
   OmiseCharge, 
@@ -17,6 +17,16 @@ import {
 } from '../types/omise.js';
 import { Logger } from './logger.js';
 import { RequestContext, ResponseContext, RateLimitInfo } from '../types/mcp.js';
+
+// Extend Axios types to include custom metadata
+declare module 'axios' {
+  export interface InternalAxiosRequestConfig {
+    metadata?: {
+      requestId: string;
+      timestamp: string;
+    };
+  }
+}
 
 export class OmiseClient {
   private client: AxiosInstance;
@@ -54,7 +64,7 @@ export class OmiseClient {
         const requestId = this.generateRequestId();
         const timestamp = new Date().toISOString();
         
-        if (this.config.logging.enableRequestLogging) {
+        if (this.config.logging?.enableRequestLogging) {
           this.logger.info('Omise API Request', {
             requestId,
             method: config.method?.toUpperCase(),
@@ -80,9 +90,9 @@ export class OmiseClient {
       (response: AxiosResponse) => {
         const requestId = response.config.metadata?.requestId;
         const timestamp = response.config.metadata?.timestamp;
-        const duration = Date.now() - new Date(timestamp).getTime();
+        const duration = timestamp ? Date.now() - new Date(timestamp).getTime() : 0;
 
-        if (this.config.logging.enableResponseLogging) {
+        if (this.config.logging?.enableResponseLogging) {
           this.logger.info('Omise API Response', {
             requestId,
             status: response.status,

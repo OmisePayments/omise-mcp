@@ -2,10 +2,15 @@
  * Health Check Implementation
  */
 
-import type { Request, Response } from 'express';
+// Note: Express types removed - not needed for MCP server
+// If you need HTTP endpoints, install @types/express
 import { OmiseClient } from './omise-client.js';
 import { Logger } from './logger.js';
 import { ServerConfig } from '../types/mcp.js';
+
+// Generic HTTP types for compatibility
+type Request = any;
+type Response = any;
 
 export interface HealthCheckResult {
   status: 'healthy' | 'unhealthy' | 'degraded';

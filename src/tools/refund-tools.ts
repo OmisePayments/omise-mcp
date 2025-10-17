@@ -18,6 +18,7 @@ import { ToolResult } from '../types/mcp.js';
 import { 
   CreateRefundRequest, 
   OmiseRefund,
+  OmiseCharge,
   OmiseListResponse,
   OmiseMetadata 
 } from '../types/omise.js';
@@ -208,11 +209,11 @@ export class RefundTools {
       // First get charge information to confirm maximum refund amount
       let maxRefundAmount: number;
       try {
-        const charge = await this.omiseClient.get(`/charges/${params.charge_id}`);
+        const charge = await this.omiseClient.get<OmiseCharge>(`/charges/${params.charge_id}`);
         maxRefundAmount = charge.amount;
         
         // Check existing refunds
-        const existingRefunds = await this.omiseClient.get(`/charges/${params.charge_id}/refunds`);
+        const existingRefunds = await this.omiseClient.get<OmiseListResponse<OmiseRefund>>(`/charges/${params.charge_id}/refunds`);
         const totalRefunded = existingRefunds.data.reduce((sum: number, refund: any) => sum + refund.amount, 0);
         maxRefundAmount = charge.amount - totalRefunded;
       } catch (error) {

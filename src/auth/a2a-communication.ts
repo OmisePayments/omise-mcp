@@ -215,6 +215,7 @@ export class A2ACommunication {
       clientId: this.config.agentId,
       redirectUri: `${this.config.baseUrl}/oauth/callback`,
       scope: ['read', 'write'],
+      state: crypto.randomBytes(16).toString('hex'),
       codeVerifier: this.generateCodeVerifier()
     };
 

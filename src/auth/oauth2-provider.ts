@@ -87,6 +87,7 @@ export class OAuth2Provider {
       redirectUri: request.redirectUri,
       scope: request.scope,
       codeVerifier: request.codeVerifier,
+      codeChallenge: codeChallenge,
       state,
       expiresAt: new Date(Date.now() + this.config.authorizationCodeExpiry)
     });
@@ -365,6 +366,7 @@ interface AuthorizationCode {
   redirectUri: string;
   scope: string[];
   codeVerifier: string;
+  codeChallenge: string;
   state: string;
   expiresAt: Date;
 }

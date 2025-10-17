@@ -17,8 +17,8 @@ WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
 
-# 依存関係のインストール（本番用のみ）
-RUN npm ci --only=production && npm cache clean --force
+# 依存関係のインストール（ビルドに必要な全ての依存関係）
+RUN npm ci && npm cache clean --force
 
 # ソースコードのコピー
 COPY src/ ./src/
@@ -41,10 +41,14 @@ RUN apk add --no-cache \
 # 作業ディレクトリの設定
 WORKDIR /app
 
-# 本番用ファイルのコピー
+# パッケージファイルのコピー
+COPY --chown=omise:nodejs package*.json ./
+
+# 本番用依存関係のみインストール
+RUN npm ci --only=production && npm cache clean --force
+
+# ビルド済みアプリケーションのコピー
 COPY --from=builder --chown=omise:nodejs /app/dist ./dist
-COPY --from=builder --chown=omise:nodejs /app/node_modules ./node_modules
-COPY --from=builder --chown=omise:nodejs /app/package*.json ./
 
 # ログディレクトリの作成
 RUN mkdir -p /app/logs && chown -R omise:nodejs /app/logs

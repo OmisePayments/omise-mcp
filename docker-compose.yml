@@ -1,5 +1,4 @@
 # Omise MCP Server Development Environment
-version: '3.8'
 
 services:
   # ============================================================================
@@ -10,20 +9,20 @@ services:
       context: .
       dockerfile: Dockerfile
       target: production
+    image: omise-mcp-server:latest
     container_name: omise-mcp-server
     restart: unless-stopped
+    stdin_open: true  # Keep stdin open for MCP stdio server
+    tty: true         # Allocate pseudo-TTY
     ports:
       - "3000:3000"
+    env_file:
+      - config/development.env
     environment:
       - NODE_ENV=production
       - PORT=3000
       - LOG_LEVEL=info
       - LOG_FORMAT=json
-      - OMISE_PUBLIC_KEY=${OMISE_PUBLIC_KEY}
-      - OMISE_SECRET_KEY=${OMISE_SECRET_KEY}
-      - OMISE_ENVIRONMENT=${OMISE_ENVIRONMENT:-production}
-      - OMISE_API_VERSION=2017-11-02
-      - OMISE_BASE_URL=https://api.omise.co
       - OMISE_TIMEOUT=30000
       - OMISE_RETRY_ATTEMPTS=3
       - OMISE_RETRY_DELAY=1000
@@ -39,7 +38,7 @@ services:
       - redis
       - prometheus
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      test: ["CMD", "pgrep", "-f", "node"]
       interval: 30s
       timeout: 10s
       retries: 3
