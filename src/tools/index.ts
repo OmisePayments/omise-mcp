@@ -12,7 +12,4 @@ export * from './refund-tools.js';
 export * from './dispute-tools.js';
 export * from './schedule-tools.js';
 export * from './event-tools.js';
-export * from './webhook-tools.js';
-export * from './link-tools.js';
-export * from './chain-tools.js';
 export * from './capability-tools.js';

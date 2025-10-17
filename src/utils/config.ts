@@ -91,16 +91,15 @@ export function getServerInfo(config: ServerConfig) {
         'create_transfer', 'get_transfer',
         'create_recipient', 'get_recipient',
         'create_refund', 'get_refund',
-        'create_link', 'get_link',
         'create_source', 'get_source',
         'create_schedule', 'get_schedule',
-        'get_capability', 'get_chain'
+        'get_capability'
       ],
       resources: [
         'charge', 'customer', 'card', 'token',
         'transfer', 'recipient', 'transaction',
         'refund', 'dispute', 'event', 'schedule',
-        'link', 'source', 'capability', 'chain'
+        'source', 'capability'
       ]
     },
     supportedTools: [
@@ -110,16 +109,15 @@ export function getServerInfo(config: ServerConfig) {
       'create_transfer', 'get_transfer',
       'create_recipient', 'get_recipient',
       'create_refund', 'get_refund',
-      'create_link', 'get_link',
       'create_source', 'get_source',
       'create_schedule', 'get_schedule',
-      'get_capability', 'get_chain'
+      'get_capability'
     ],
     supportedResources: [
       'charge', 'customer', 'card', 'token',
       'transfer', 'recipient', 'transaction',
       'refund', 'dispute', 'event', 'schedule',
-      'link', 'source', 'capability', 'chain'
+      'source', 'capability'
     ]
   };
 }

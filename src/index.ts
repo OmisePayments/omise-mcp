@@ -22,9 +22,6 @@ import { RefundTools } from './tools/refund-tools.js';
 import { DisputeTools } from './tools/dispute-tools.js';
 import { ScheduleTools } from './tools/schedule-tools.js';
 import { EventTools } from './tools/event-tools.js';
-import { WebhookTools } from './tools/webhook-tools.js';
-import { LinkTools } from './tools/link-tools.js';
-import { ChainTools } from './tools/chain-tools.js';
 import { CapabilityTools } from './tools/capability-tools.js';
 import type { ServerInfo } from './types/mcp.js';
 
@@ -51,9 +48,6 @@ async function main() {
     const disputeTools = new DisputeTools(omiseClient, logger);
     const scheduleTools = new ScheduleTools(omiseClient, logger);
     const eventTools = new EventTools(omiseClient, logger);
-    const webhookTools = new WebhookTools(omiseClient, logger);
-    const linkTools = new LinkTools(omiseClient, logger);
-    const chainTools = new ChainTools(omiseClient, logger);
     const capabilityTools = new CapabilityTools(omiseClient, logger);
 
     // Get server information
@@ -80,9 +74,6 @@ async function main() {
         ...disputeTools.getTools(),
         ...scheduleTools.getTools(),
         ...eventTools.getTools(),
-        ...webhookTools.getTools(),
-        ...linkTools.getTools(),
-        ...chainTools.getTools(),
         ...capabilityTools.getTools(),
       ];
 
@@ -265,45 +256,6 @@ async function main() {
             break;
           case 'retrieve_event':
             result = await eventTools.retrieveEvent(args as any);
-            break;
-          // Webhook API tools
-          case 'webhook_endpoint_list':
-            result = await webhookTools.listWebhookEndpoints(args as any);
-            break;
-          case 'webhook_endpoint_create':
-            result = await webhookTools.createWebhookEndpoint(args as any);
-            break;
-          case 'webhook_endpoint_retrieve':
-            result = await webhookTools.retrieveWebhookEndpoint(args as any);
-            break;
-          case 'webhook_endpoint_update':
-            result = await webhookTools.updateWebhookEndpoint(args as any);
-            break;
-          case 'webhook_endpoint_destroy':
-            result = await webhookTools.destroyWebhookEndpoint(args as any);
-            break;
-          // Link API tools
-          case 'create_link':
-            result = await linkTools.createLink(args as any);
-            break;
-          case 'retrieve_link':
-            result = await linkTools.retrieveLink(args as any);
-            break;
-          case 'list_links':
-            result = await linkTools.listLinks(args as any);
-            break;
-          // Chain API tools
-          case 'create_chain':
-            result = await chainTools.createChain(args as any);
-            break;
-          case 'retrieve_chain':
-            result = await chainTools.retrieveChain(args as any);
-            break;
-          case 'list_chains':
-            result = await chainTools.listChains(args as any);
-            break;
-          case 'list_chain_revisions':
-            result = await chainTools.listChainRevisions(args as any);
             break;
           // Capability API tools
           case 'retrieve_capability':
