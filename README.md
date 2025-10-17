@@ -34,11 +34,6 @@
 ### 🔍 Monitoring & Analytics
 - **Event Management**: Track system events
 - **Dispute Management**: Handle chargebacks
-- **Webhooks**: Real-time notifications
-
-### 🔗 Links & Chains
-- **Payment Links**: Shareable payment links
-- **Chain Management**: Multi-tenant support
 - **Capability Check**: API functionality verification
 
 ## 📋 Supported APIs
@@ -52,12 +47,9 @@
 | **Dispute** | Chargeback Processing | 7 | [Omise Disputes API](https://www.omise.co/disputes-api) |
 | **Schedule** | Recurring Payments | 5 | [Omise Schedules API](https://www.omise.co/schedules-api) |
 | **Event** | Event Management | 2 | [Omise Events API](https://www.omise.co/events-api) |
-| **Webhook** | Notification Management | 5 | [Omise Webhooks API](https://www.omise.co/webhooks-api) |
-| **Link** | Payment Links | 3 | [Omise Links API](https://www.omise.co/links-api) |
-| **Chain** | Multi-tenant | 4 | [Omise Chains API](https://www.omise.co/chains-api) |
 | **Capability** | Feature Verification | 1 | [Omise Capabilities API](https://www.omise.co/capabilities-api) |
 
-**Total: 51 tools** covering all Omise API functionality
+**Total: ~45 tools** covering all active Omise Core API functionality
 
 ## 🛠️ Technology Stack
 
@@ -279,9 +271,6 @@ omise-mcp-server/
 │   │   ├── dispute-tools.ts     # Dispute-related tools
 │   │   ├── schedule-tools.ts    # Schedule-related tools
 │   │   ├── event-tools.ts       # Event-related tools
-│   │   ├── webhook-tools.ts     # Webhook-related tools
-│   │   ├── link-tools.ts        # Link-related tools
-│   │   ├── chain-tools.ts       # Chain-related tools
 │   │   ├── capability-tools.ts  # Capability verification tools
 │   │   └── index.ts             # Tool exports
 │   └── utils/                    # Utilities
@@ -576,9 +565,6 @@ Create a secure card token for payment processing.
 - [Omise Disputes API](https://www.omise.co/disputes-api)
 - [Omise Schedules API](https://www.omise.co/schedules-api)
 - [Omise Events API](https://www.omise.co/events-api)
-- [Omise Webhooks API](https://www.omise.co/webhooks-api)
-- [Omise Links API](https://www.omise.co/links-api)
-- [Omise Chains API](https://www.omise.co/chains-api)
 - [Omise Capabilities API](https://www.omise.co/capabilities-api)
 
 ### Technical Documentation
