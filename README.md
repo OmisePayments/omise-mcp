@@ -68,7 +68,7 @@
 
 ### Prerequisites
 
-- Node.js 20+ 
+- Node.js 20+
 - npm or yarn
 - [Omise Account](https://dashboard.omise.co/) and API keys
 
@@ -160,27 +160,27 @@ curl http://localhost:3000/tools
 ```typescript
 // Create a charge
 const charge = await mcpClient.callTool('create_charge', {
-  amount: 10000,        // 100.00 THB (smallest currency unit)
-  currency: 'THB',
-  description: 'Test payment',
-  capture: true
+    amount: 10000,        // 100.00 THB (smallest currency unit)
+    currency: 'THB',
+    description: 'Test payment',
+    capture: true
 });
 
 // Create a customer
 const customer = await mcpClient.callTool('create_customer', {
-  email: 'customer@example.com',
-  description: 'Test customer'
+    email: 'customer@example.com',
+    description: 'Test customer'
 });
 
 // Create a card token
 const token = await mcpClient.callTool('create_token', {
-  card: {
-    name: 'John Doe',
-    number: '4242424242424242',
-    expiration_month: 12,
-    expiration_year: 2025,
-    security_code: '123'
-  }
+    card: {
+        name: 'John Doe',
+        number: '4242424242424242',
+        expiration_month: 12,
+        expiration_year: 2025,
+        security_code: '123'
+    }
 });
 ```
 
@@ -189,15 +189,15 @@ const token = await mcpClient.callTool('create_token', {
 ```typescript
 // Create a schedule
 const schedule = await mcpClient.callTool('create_schedule', {
-  every: 1,
-  period: 'month',
-  start_date: '2024-01-01',
-  charge: {
-    customer: 'cust_123',
-    amount: 5000,
-    currency: 'THB',
-    description: 'Monthly subscription'
-  }
+    every: 1,
+    period: 'month',
+    start_date: '2024-01-01',
+    charge: {
+        customer: 'cust_123',
+        amount: 5000,
+        currency: 'THB',
+        description: 'Monthly subscription'
+    }
 });
 ```
 
@@ -206,20 +206,20 @@ const schedule = await mcpClient.callTool('create_schedule', {
 ```typescript
 // Create a recipient
 const recipient = await mcpClient.callTool('create_recipient', {
-  name: 'John Doe',
-  email: 'john@example.com',
-  type: 'individual',
-  bank_account: {
-    brand: 'bbl',
-    number: '1234567890',
-    name: 'John Doe'
-  }
+    name: 'John Doe',
+    email: 'john@example.com',
+    type: 'individual',
+    bank_account: {
+        brand: 'bbl',
+        number: '1234567890',
+        name: 'John Doe'
+    }
 });
 
 // Execute transfer
 const transfer = await mcpClient.callTool('create_transfer', {
-  amount: 10000,
-  recipient: recipient.id
+    amount: 10000,
+    recipient: recipient.id
 });
 ```
 
@@ -425,6 +425,152 @@ docker-compose logs -f
 - **Rate limiting**: API call restrictions
 - **Sensitive data masking**: Hide sensitive information in logs
 - **Environment isolation**: Complete separation of test and production environments
+- **Tool Access Control**: Granular control over which API tools clients can access
+
+### Tool Access Control
+
+The MCP server requires explicit tool access configuration for enhanced security. Each client must specify which Omise API tools they are authorized to use.
+
+#### Configuration
+
+Set the `TOOLS` environment variable (**mandatory**):
+
+- `TOOLS=all` - Full access to all 51 tools (use cautiously)
+- `TOOLS=create_charge,list_charges` - Specific tools only (recommended)
+- `TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer` - Read-only access pattern
+
+#### Examples
+
+**Full access (development/testing):**
+```bash
+export TOOLS=all
+docker-compose up
+```
+
+**Read-only access (monitoring/analytics):**
+```bash
+export TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer
+docker-compose up
+```
+
+**Payment processing only:**
+```bash
+export TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_token
+docker-compose up
+```
+
+**Podman with specific tools:**
+```bash
+podman run --rm -i \
+  -e OMISE_PUBLIC_KEY=pkey_test_xxx \
+  -e OMISE_SECRET_KEY=skey_test_xxx \
+  -e OMISE_ENVIRONMENT=test \
+  -e TOOLS=create_charge,list_charges,create_customer \
+  omise-mcp-server:latest
+```
+
+#### Available Tools by Category
+
+| Category | Tools | Description |
+|----------|-------|-------------|
+| **Charges** | `create_charge`, `retrieve_charge`, `list_charges`, `update_charge`, `capture_charge`, `reverse_charge`, `expire_charge` | Payment charge operations |
+| **Customers** | `create_customer`, `retrieve_customer`, `list_customers`, `update_customer`, `destroy_customer` | Customer management |
+| **Cards** | `list_customer_cards`, `retrieve_customer_card`, `update_customer_card`, `destroy_customer_card` | Card management |
+| **Tokens** | `create_token`, `retrieve_token` | Tokenization |
+| **Sources** | `create_source`, `retrieve_source` | Payment sources |
+| **Transfers** | `create_transfer`, `retrieve_transfer`, `list_transfers`, `update_transfer`, `destroy_transfer` | Transfer operations |
+| **Recipients** | `create_recipient`, `retrieve_recipient`, `list_recipients`, `update_recipient`, `destroy_recipient`, `verify_recipient` | Recipient management |
+| **Refunds** | `create_refund`, `retrieve_refund`, `list_refunds` | Refund processing |
+| **Disputes** | `list_disputes`, `retrieve_dispute`, `accept_dispute`, `update_dispute`, `list_dispute_documents`, `retrieve_dispute_document`, `upload_dispute_document`, `destroy_dispute_document` | Dispute handling |
+| **Schedules** | `create_schedule`, `retrieve_schedule`, `list_schedules`, `destroy_schedule`, `list_schedule_occurrences` | Recurring payments |
+| **Events** | `list_events`, `retrieve_event` | Event tracking |
+| **Capabilities** | `retrieve_capability` | Feature verification |
+
+#### Error Handling
+
+The server will **fail to start** if:
+- `TOOLS` environment variable is not set
+- `TOOLS` is empty or contains only whitespace
+- `TOOLS` contains invalid tool names (e.g., `TOOLS=hello,invalid_tool`)
+
+Clients will receive an **authorization error** if:
+- They attempt to call a tool not in their allowed list
+
+**Invalid Tool Names Error Example:**
+```
+Error: Invalid tool names in TOOLS environment variable: hello, invalid_tool. Valid tools are: create_charge, retrieve_charge, list_charges, update_charge, capture_charge, reverse_charge, expire_charge, create_customer, retrieve_customer, list_customers, update_customer, destroy_customer, list_customer_cards, retrieve_customer_card, update_customer_card, destroy_customer_card, create_token, retrieve_token, create_source, retrieve_source, create_transfer, retrieve_transfer, list_transfers, update_transfer, destroy_transfer, create_recipient, retrieve_recipient, list_recipients, update_recipient, destroy_recipient, verify_recipient, create_refund, retrieve_refund, list_refunds, list_disputes, retrieve_dispute, accept_dispute, update_dispute, list_dispute_documents, retrieve_dispute_document, upload_dispute_document, destroy_dispute_document, create_schedule, retrieve_schedule, list_schedules, destroy_schedule, list_schedule_occurrences, list_events, retrieve_event, retrieve_capability. Use TOOLS=all for full access.
+```
+
+**Error Response Example:**
+```json
+{
+  "success": false,
+  "error": "Access denied: Tool 'delete_charge' is not authorized",
+  "code": "TOOL_NOT_AUTHORIZED",
+  "allowed_configuration": "3 tools: create_charge, list_charges, retrieve_charge",
+  "metadata": {
+    "requestId": "req_1234567890_abc123",
+    "timestamp": "2025-10-15T10:30:00.000Z",
+    "duration": 2
+  }
+}
+```
+
+#### Security Best Practices
+
+1. **Principle of Least Privilege**: Only grant access to tools that are absolutely necessary
+2. **Production Restrictions**: Never use `TOOLS=all` in production environments
+3. **Role-Based Access**: Create different MCP server instances for different roles:
+    - **Admin**: Full access for administrative tasks
+    - **Payment**: Only charge and customer creation tools
+    - **Reporting**: Only list and retrieve tools (read-only)
+    - **Support**: Customer and event viewing tools
+4. **Regular Audits**: Review tool access configurations periodically
+5. **Environment Separation**: Use different tool sets for development, staging, and production
+
+#### Multiple Client Configurations
+
+Use Cursor's `mcp.json` to configure multiple clients with different access levels:
+
+```json
+{
+  "mcpServers": {
+    "omise-admin": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
+        "-e", "OMISE_SECRET_KEY=skey_xxx",
+        "-e", "OMISE_ENVIRONMENT=production",
+        "-e", "TOOLS=all",
+        "omise-mcp-server:latest"
+      ]
+    },
+    "omise-readonly": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
+        "-e", "OMISE_SECRET_KEY=skey_xxx",
+        "-e", "OMISE_ENVIRONMENT=production",
+        "-e", "TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer",
+        "omise-mcp-server:latest"
+      ]
+    },
+    "omise-payment": {
+      "command": "docker",
+      "args": [
+        "run", "--rm", "-i",
+        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
+        "-e", "OMISE_SECRET_KEY=skey_xxx",
+        "-e", "OMISE_ENVIRONMENT=production",
+        "-e", "TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_token",
+        "omise-mcp-server:latest"
+      ]
+    }
+  }
+}
+```
 
 ### SSL/TLS Configuration
 
@@ -545,13 +691,13 @@ Create a secure card token for payment processing.
 
 **Parameters:**
 - `card` (required): Card information
-  - `name` (required): Cardholder name
-  - `number` (required): Card number
-  - `expiration_month` (required): Expiration month (1-12)
-  - `expiration_year` (required): Expiration year (4 digits)
-  - `city` (optional): Billing address city
-  - `postal_code` (optional): Billing address postal code
-  - `security_code` (optional): Security code (CVV/CVC)
+    - `name` (required): Cardholder name
+    - `number` (required): Card number
+    - `expiration_month` (required): Expiration month (1-12)
+    - `expiration_year` (required): Expiration year (4 digits)
+    - `city` (optional): Billing address city
+    - `postal_code` (optional): Billing address postal code
+    - `security_code` (optional): Security code (CVV/CVC)
 
 ## 🔗 External Links
 

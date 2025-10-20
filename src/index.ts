@@ -12,6 +12,7 @@ import {
 import { loadConfig, validateOmiseKeys, getServerInfo } from './utils/config.js';
 import { Logger } from './utils/logger.js';
 import { OmiseClient } from './utils/omise-client.js';
+import { AccessControlService } from './auth/access-control.js';
 import { PaymentTools } from './tools/payment-tools.js';
 import { CustomerTools } from './tools/customer-tools.js';
 import { TokenTools } from './tools/token-tools.js';
@@ -36,6 +37,12 @@ async function main() {
 
     // Initialize Omise client
     const omiseClient = new OmiseClient({ ...config.omise, logging: config.logging }, logger);
+
+    // Initialize access control (mandatory)
+    const accessControl = new AccessControlService(config.tools.allowed);
+      logger.info('Access control initialized', {
+          configuration: accessControl.getConfigSummary()
+    });
 
     // Initialize tools
     const paymentTools = new PaymentTools(omiseClient, logger);
@@ -77,10 +84,17 @@ async function main() {
         ...capabilityTools.getTools(),
       ];
 
-      logger.info('Available tools', { count: allTools.length, tools: allTools.map(t => t.name) });
+      // Filter tools based on access control
+      const availableTools = accessControl.filterAvailableTools(allTools);
+
+      logger.info('Available tools requested', {
+          total: allTools.length,
+          allowed: availableTools.length,
+          tools: availableTools.map(t => t.name)
+      });
 
       return {
-        tools: allTools,
+        tools: availableTools,
       };
     });
 
@@ -89,6 +103,43 @@ async function main() {
       const { name, arguments: args } = request.params;
       const startTime = Date.now();
       const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      logger.info('Tool execution requested', {
+          requestId,
+          tool: name,
+          arguments: args
+      });
+
+      // ACCESS CONTROL CHECK
+      if (!accessControl.isToolAllowed(name)) {
+        const duration = Date.now() - startTime;
+        logger.warn('Tool access denied', {
+          requestId,
+          tool: name,
+          duration,
+          reason: 'Tool not in allowed list'
+        });
+
+        return {
+          content: [
+            {
+              type: 'text',
+              text: JSON.stringify({
+              success: false,
+              error: `Access denied: Tool '${name}' is not authorized`,
+              code: 'TOOL_NOT_AUTHORIZED',
+              allowed_configuration: accessControl.getConfigSummary(),
+              metadata: {
+                requestId,
+                timestamp: new Date().toISOString(),
+                duration
+                }
+              }, null, 2),
+            },
+          ],
+          isError: true,
+        };
+      }
 
       try {
         logger.info(`Executing tool: ${name}`, { 
