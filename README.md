@@ -1,6 +1,6 @@
 # Omise MCP Server
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-org/omise-mcp-server)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/omise/omise-mcp)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.2+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
@@ -76,8 +76,8 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/omise-mcp-server.git
-cd omise-mcp-server
+git clone git@github.com:omise/omise-mcp.git
+cd omise-mcp
 
 # Install dependencies
 npm install
@@ -579,9 +579,9 @@ Create a secure card token for payment processing.
 
 ### Support
 
-- **GitHub Issues**: [Bug reports and feature requests](https://github.com/your-org/omise-mcp-server/issues)
+- **GitHub Issues**: [Bug reports and feature requests](https://github.com/omise/omise-mcp/issues)
 - **Omise Support**: [Omise official support](https://www.omise.co/support)
-- **Community**: [Developer community](https://github.com/your-org/omise-mcp-server/discussions)
+- **Community**: [Developer community](https://github.com/omise/omise-mcp/discussions)
 
 ## 📄 License
 

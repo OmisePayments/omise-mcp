@@ -43,8 +43,8 @@ GRAFANA_PASSWORD=your_grafana_password
 
 ### 1. リポジトリのクローン
 ```bash
-git clone <repository-url>
-cd omise-mcp-server
+git clone git@github.com:omise/omise-mcp.git
+cd omise-mcp
 ```
 
 ### 2. 環境設定
