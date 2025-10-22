@@ -3,7 +3,7 @@
  * Manages which tools clients can access based on TOOLS environment variable
  */
 
-import { validateToolNames, getAllValidToolsString } from '../utils/valid-tools';
+import { validateToolNames, getAllValidToolsString } from '../utils/valid-tools.js';
 
 export class AccessControlService {
   private readonly allowedTools: string[] | 'all';
