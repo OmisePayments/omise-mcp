@@ -96,6 +96,11 @@ export OMISE_ENVIRONMENT=test
 export OMISE_API_VERSION=2019-05-29
 export OMISE_BASE_URL=https://api.omise.co
 export OMISE_VAULT_URL=https://vault.omise.co
+
+# Set tool access control (mandatory)
+export TOOLS=all  # For development only
+# Or for production, specify exact tools:
+# export TOOLS=create_charge,retrieve_charge,list_charges,create_customer
 ```
 
 #### 2.4. Environment-Specific Configuration
@@ -130,6 +135,7 @@ npm run dev
 # Or verify with a simple check
 echo $OMISE_PUBLIC_KEY | grep -q "pkey_" && echo "✅ Public key configured" || echo "❌ Public key missing"
 echo $OMISE_SECRET_KEY | grep -q "skey_" && echo "✅ Secret key configured" || echo "❌ Secret key missing"
+echo $TOOLS | grep -q "." && echo "✅ TOOLS configured: $TOOLS" || echo "❌ TOOLS not set (required)"
 ```
 
 ### 3. Start Development Server
@@ -232,6 +238,7 @@ const transfer = await mcpClient.callTool('create_transfer', {
 | `OMISE_PUBLIC_KEY` | Omise public key | ✓ | - |
 | `OMISE_SECRET_KEY` | Omise secret key | ✓ | - |
 | `OMISE_ENVIRONMENT` | Environment (test/production) | ✓ | - |
+| `TOOLS` | Comma-separated list of allowed tools or 'all' | ✓ | - |
 | `PORT` | Server port | - | 3000 |
 | `HOST` | Server host | - | localhost |
 | `LOG_LEVEL` | Log level | - | info |
@@ -433,11 +440,16 @@ The MCP server requires explicit tool access configuration for enhanced security
 
 #### Configuration
 
-Set the `TOOLS` environment variable (**mandatory**):
+Set the `TOOLS` environment variable (**mandatory**). The server will not start without this configuration.
 
-- `TOOLS=all` - Full access to all 51 tools (use cautiously)
-- `TOOLS=create_charge,list_charges` - Specific tools only (recommended)
-- `TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer` - Read-only access pattern
+**Options:**
+- `TOOLS=all` - Full access to all 50 tools (development only, not recommended for production)
+- `TOOLS=tool1,tool2,...` - Comma-separated list of specific tools (recommended for production)
+
+**Common Patterns:**
+- **Read-only access**: `TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer`
+- **Payment processing**: `TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_token`
+- **Finance operations**: `TOOLS=list_charges,retrieve_charge,create_refund,create_transfer`
 
 #### Examples
 
@@ -496,37 +508,39 @@ The server will **fail to start** if:
 Clients will receive an **authorization error** if:
 - They attempt to call a tool not in their allowed list
 
-**Invalid Tool Names Error Example:**
-```
-Error: Invalid tool names in TOOLS environment variable: hello, invalid_tool. Valid tools are: create_charge, retrieve_charge, list_charges, update_charge, capture_charge, reverse_charge, expire_charge, create_customer, retrieve_customer, list_customers, update_customer, destroy_customer, list_customer_cards, retrieve_customer_card, update_customer_card, destroy_customer_card, create_token, retrieve_token, create_source, retrieve_source, create_transfer, retrieve_transfer, list_transfers, update_transfer, destroy_transfer, create_recipient, retrieve_recipient, list_recipients, update_recipient, destroy_recipient, verify_recipient, create_refund, retrieve_refund, list_refunds, list_disputes, retrieve_dispute, accept_dispute, update_dispute, list_dispute_documents, retrieve_dispute_document, upload_dispute_document, destroy_dispute_document, create_schedule, retrieve_schedule, list_schedules, destroy_schedule, list_schedule_occurrences, list_events, retrieve_event, retrieve_capability. Use TOOLS=all for full access.
+**Example Errors:**
+
+```bash
+# Missing TOOLS environment variable
+Error: Missing required environment variable: TOOLS
+Set TOOLS=all for full access, or specify comma-separated tool names.
+Example: TOOLS=create_charge,list_charges,create_customer
+
+# Invalid tool names
+Error: Invalid tool names: hello, invalid_tool
+Valid tools are: create_charge, retrieve_charge, list_charges, ... (50 total)
+Use TOOLS=all for full access.
 ```
 
-**Error Response Example:**
-```json
-{
-  "success": false,
-  "error": "Access denied: Tool 'delete_charge' is not authorized",
-  "code": "TOOL_NOT_AUTHORIZED",
-  "allowed_configuration": "3 tools: create_charge, list_charges, retrieve_charge",
-  "metadata": {
-    "requestId": "req_1234567890_abc123",
-    "timestamp": "2025-10-15T10:30:00.000Z",
-    "duration": 2
-  }
-}
-```
+**Runtime Behavior:**
+
+When `TOOLS` is properly configured:
+- Only authorized tools appear in `list_tools` responses
+- Unauthorized tools are not accessible to clients
+- Access control is enforced at the MCP protocol level
 
 #### Security Best Practices
 
-1. **Principle of Least Privilege**: Only grant access to tools that are absolutely necessary
-2. **Production Restrictions**: Never use `TOOLS=all` in production environments
-3. **Role-Based Access**: Create different MCP server instances for different roles:
-    - **Admin**: Full access for administrative tasks
-    - **Payment**: Only charge and customer creation tools
-    - **Reporting**: Only list and retrieve tools (read-only)
-    - **Support**: Customer and event viewing tools
-4. **Regular Audits**: Review tool access configurations periodically
-5. **Environment Separation**: Use different tool sets for development, staging, and production
+1. **Principle of Least Privilege**: Only grant access to tools absolutely necessary for the role
+2. **Production Restrictions**: Never use `TOOLS=all` in production - always specify exact tools
+3. **Role-Based Deployment**: Run separate MCP server instances for different user roles:
+   - **Read-Only (Analytics/Support)**: `list_charges,retrieve_charge,list_customers,retrieve_customer`
+   - **Payment Processing (Merchants)**: `create_charge,retrieve_charge,capture_charge,create_customer,create_token`
+   - **Finance Operations**: `list_charges,create_refund,create_transfer,create_recipient`
+   - **Admin (Development/Emergency)**: `all` (use with caution)
+4. **Regular Audits**: Review and document tool access configurations periodically
+5. **Environment Separation**: Use different TOOLS configurations for dev, staging, and production
+6. **Configuration Management**: Store TOOLS settings in environment-specific config files
 
 #### Multiple Client Configurations
 
