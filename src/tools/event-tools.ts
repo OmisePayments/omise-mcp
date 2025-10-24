@@ -136,17 +136,17 @@ export class EventTools {
   }
 
   private validateResourceKey(key: string): boolean {
-    // Resource key format validation (charge, customer, card, transfer, recipient, refund, dispute, schedule, link)
+    // Resource key format validation - all use 19 chars and support test_ prefix
     const resourcePatterns = [
-      /^chrg_[a-zA-Z0-9]{16}$/,  // charge
-      /^cust_[a-zA-Z0-9]{16}$/,  // customer
-      /^card_[a-zA-Z0-9]{16}$/,  // card
-      /^trsf_[a-zA-Z0-9]{16}$/,  // transfer
+      /^chrg_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // charge
+      /^cust_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // customer
+      /^card_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // card
+      /^trsf_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // transfer
       /^recp_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // recipient
-      /^rfnd_[a-zA-Z0-9]{16}$/,  // refund
-      /^dspt_[a-zA-Z0-9]{16}$/,  // dispute
-      /^schd_[a-zA-Z0-9]{16}$/,  // schedule
-      /^link_[a-zA-Z0-9]{16}$/   // link
+      /^rfnd_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // refund
+      /^dspt_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // dispute
+      /^schd_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // schedule
+      /^link_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/   // link
     ];
     return resourcePatterns.some(pattern => pattern.test(key));
   }
