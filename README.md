@@ -1,12 +1,15 @@
 # Omise MCP Server
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/omise/omise-mcp)
+[![Version](https://img.shields.io/badge/version-1.0.0--alpha-blue.svg)](https://github.com/omise/omise-mcp)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.2+-blue.svg)](https://www.typescriptlang.org/)
 [![Node.js](https://img.shields.io/badge/Node.js-20+-green.svg)](https://nodejs.org/)
 [![Docker](https://img.shields.io/badge/Docker-supported-blue.svg)](https://www.docker.com/)
+[![Release](https://img.shields.io/badge/release-alpha-orange.svg)](https://github.com/omise/omise-mcp/releases)
 
 **Omise MCP Server** is a comprehensive server for integrating with Omise payment APIs using [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). Implemented in TypeScript with full support for Omise API v2017-11-02.
+
+> **⚠️ Alpha Release**: This is an alpha release for early adopters and testing. Some features may be experimental.
 
 ## 🚀 Key Features
 
@@ -60,9 +63,6 @@
 - **Logging**: Winston
 - **Testing**: Jest + MSW
 - **Containerization**: Docker + Docker Compose
-- **Monitoring**: Prometheus + Grafana
-- **Caching**: Redis
-- **Log Aggregation**: Loki
 
 ## 🚀 Quick Start
 
@@ -109,12 +109,6 @@ export TOOLS=all  # For development only
 ```bash
 cp config/development.env .env
 # Use test API keys, enable verbose logging
-```
-
-**For Staging:**
-```bash
-cp config/staging.env .env
-# Use test API keys, production-like settings
 ```
 
 **For Production:**
@@ -295,14 +289,8 @@ omise-mcp-server/
 │   ├── mocks/                    # Mocks
 │   └── factories/                # Test factories
 ├── config/                       # Configuration files
-│   ├── development.env          # Development environment
-│   ├── staging.env              # Staging environment
-│   └── production.env            # Production environment
-├── monitoring/                   # Monitoring configuration
-│   ├── prometheus.yml            # Prometheus configuration
-│   ├── loki-config.yml          # Loki configuration
-│   └── grafana/                  # Grafana configuration
-├── nginx/                        # Nginx configuration
+│   ├── development.env.example  # Development template
+│   └── production.env.example   # Production template
 ├── docker-compose.yml            # Docker Compose configuration
 ├── Dockerfile                    # Docker configuration
 ├── package.json                  # Dependencies
@@ -387,40 +375,6 @@ docker-compose --env-file config/production.env up -d
 curl http://localhost:3000/health
 curl http://localhost:3000/ready
 curl http://localhost:3000/live
-```
-
-### Automated Deployment
-
-```bash
-# Run deployment script
-./deploy.sh latest production
-```
-
-## 📊 Monitoring & Logs
-
-### Prometheus Metrics
-
-- **URL**: http://localhost:9090
-- **Metrics**: CPU, memory, request count, response time
-- **Alerts**: High load, error rate monitoring
-
-### Grafana Dashboard
-
-- **URL**: http://localhost:3001
-- **Login**: admin / admin (default)
-- **Dashboards**: System monitoring, application monitoring
-
-### Log Management
-
-```bash
-# Application logs
-docker-compose logs -f omise-mcp-server
-
-# Nginx logs
-docker-compose logs -f nginx
-
-# All service logs
-docker-compose logs -f
 ```
 
 ## 🔒 Security
@@ -586,23 +540,6 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
 }
 ```
 
-### SSL/TLS Configuration
-
-```bash
-# Place SSL certificates
-mkdir -p nginx/ssl
-cp your-cert.pem nginx/ssl/cert.pem
-cp your-key.pem nginx/ssl/key.pem
-```
-
-### Security Scanning
-
-```bash
-# Container security scan
-docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
-  aquasec/trivy image omise-mcp-server:latest
-```
-
 ## 🚨 Troubleshooting
 
 ### Common Issues
@@ -617,14 +554,15 @@ docker-compose logs omise-mcp-server
 docker-compose config
 ```
 
-#### 2. Health Check Fails
+#### 2. API Connection Issues
 
 ```bash
-# Check health check endpoint directly
-curl -v http://localhost:3000/health
+# Check health check endpoint
+curl http://localhost:3000/health
 
-# Check service connectivity
-docker-compose exec omise-mcp-server ping redis
+# Verify API keys
+echo $OMISE_PUBLIC_KEY | grep -q "pkey_" && echo "✅ Public key configured" || echo "❌ Missing"
+echo $OMISE_SECRET_KEY | grep -q "skey_" && echo "✅ Secret key configured" || echo "❌ Missing"
 ```
 
 #### 3. Memory Issues
@@ -643,8 +581,8 @@ docker system prune -a
 # Check error logs
 docker-compose logs omise-mcp-server | grep ERROR
 
-# Analyze access logs
-docker-compose logs nginx | grep "GET /"
+# View recent logs
+docker-compose logs --tail=100 omise-mcp-server
 ```
 
 ## 📚 API Reference
@@ -732,10 +670,6 @@ Create a secure card token for payment processing.
 - [Model Context Protocol (MCP)](https://modelcontextprotocol.io/)
 - [Docker Documentation](https://docs.docker.com/)
 - [Docker Compose Documentation](https://docs.docker.com/compose/)
-- [Prometheus Documentation](https://prometheus.io/docs/)
-- [Grafana Documentation](https://grafana.com/docs/)
-- [Redis Documentation](https://redis.io/docs/)
-- [Loki Documentation](https://grafana.com/docs/loki/)
 
 ### Support
 
@@ -764,27 +698,16 @@ Contributions to the project are welcome! Please follow these steps:
 - Follow ESLint rules
 - Write clear commit messages
 
-## 📈 Roadmap
-
-### v1.1.0 (Planned)
-- [ ] Additional payment method support
-- [ ] Advanced reporting features
-- [ ] Performance optimizations
-
-### v1.2.0 (Planned)
-- [ ] Enhanced multi-tenant support
-- [ ] Advanced monitoring features
-- [ ] Enhanced security features
-
 ## 📊 Statistics
 
-- **Total Tools**: 51
+- **Total Tools**: 50
 - **Supported APIs**: 11 categories
 - **Test Coverage**: 95%+
 - **TypeScript**: 100%
 - **Docker Support**: ✅
-- **Monitoring Support**: ✅
 
 ---
 
 **Omise MCP Server** - Achieve secure and efficient payment processing! 🚀
+
+> **Alpha Release Notice**: This is an early access release. We welcome feedback and bug reports via [GitHub Issues](https://github.com/omise/omise-mcp/issues).
