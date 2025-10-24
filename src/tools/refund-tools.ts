@@ -80,6 +80,10 @@ export class RefundTools {
             refund_id: {
               type: 'string',
               description: 'Refund ID to retrieve'
+            },
+            charge_id: {
+              type: 'string',
+              description: 'Charge ID (optional - if provided, uses nested endpoint /charges/{charge_id}/refunds/{refund_id})'
             }
           },
           required: ['refund_id']
@@ -264,7 +268,10 @@ export class RefundTools {
 
   async retrieveRefund(params: any): Promise<ToolResult> {
     try {
-      this.logger.info('Retrieving refund via MCP tool', { refundId: params.refund_id });
+      this.logger.info('Retrieving refund via MCP tool', { 
+        refundId: params.refund_id,
+        chargeId: params.charge_id 
+      });
 
       if (!this.validateRefundId(params.refund_id)) {
         return {
@@ -273,7 +280,24 @@ export class RefundTools {
         };
       }
 
-      const refund = await this.omiseClient.get<OmiseRefund>(`/refunds/${params.refund_id}`);
+      // Support both nested and direct endpoints
+      let endpoint: string;
+      if (params.charge_id) {
+        // Validate charge_id if provided
+        if (!this.validateChargeId(params.charge_id)) {
+          return {
+            success: false,
+            error: 'Invalid charge ID format. Must be in format: chrg_xxxxxxxxxxxxxxxx'
+          };
+        }
+        // Use nested endpoint: /charges/{charge_id}/refunds/{refund_id}
+        endpoint = `/charges/${params.charge_id}/refunds/${params.refund_id}`;
+      } else {
+        // Use direct endpoint: /refunds/{refund_id}
+        endpoint = `/refunds/${params.refund_id}`;
+      }
+
+      const refund = await this.omiseClient.get<OmiseRefund>(endpoint);
 
       return {
         success: true,
@@ -281,7 +305,10 @@ export class RefundTools {
         message: `Refund retrieved successfully`
       };
     } catch (error) {
-      this.logger.error('Failed to retrieve refund via MCP tool', error as Error, { refundId: params.refund_id });
+      this.logger.error('Failed to retrieve refund via MCP tool', error as Error, { 
+        refundId: params.refund_id,
+        chargeId: params.charge_id 
+      });
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error occurred'
@@ -293,18 +320,43 @@ export class RefundTools {
     try {
       this.logger.info('Listing refunds via MCP tool', params);
 
-      // Parameter validation and default value setting
-      const queryParams = {
-        limit: Math.min(params.limit || 20, 100),
-        offset: Math.max(params.offset || 0, 0),
-        order: params.order || 'chronological',
-        ...(params.from && { from: params.from }),
-        ...(params.to && { to: params.to }),
-        ...(params.charge && { charge: params.charge }),
-        ...(params.reason && { reason: params.reason })
-      };
+      // Support both nested and direct endpoints
+      let endpoint: string;
+      let queryParams: any;
 
-      const refunds = await this.omiseClient.get<OmiseListResponse<OmiseRefund>>('/refunds', queryParams);
+      if (params.charge) {
+        // Validate charge_id if provided
+        if (!this.validateChargeId(params.charge)) {
+          return {
+            success: false,
+            error: 'Invalid charge ID format. Must be in format: chrg_xxxxxxxxxxxxxxxx'
+          };
+        }
+        // Use nested endpoint: /charges/{charge_id}/refunds
+        endpoint = `/charges/${params.charge}/refunds`;
+        // Query params without charge (it's in the path)
+        queryParams = {
+          limit: Math.min(params.limit || 20, 100),
+          offset: Math.max(params.offset || 0, 0),
+          order: params.order || 'chronological',
+          ...(params.from && { from: params.from }),
+          ...(params.to && { to: params.to }),
+          ...(params.reason && { reason: params.reason })
+        };
+      } else {
+        // Use direct endpoint: /refunds (lists all refunds)
+        endpoint = '/refunds';
+        queryParams = {
+          limit: Math.min(params.limit || 20, 100),
+          offset: Math.max(params.offset || 0, 0),
+          order: params.order || 'chronological',
+          ...(params.from && { from: params.from }),
+          ...(params.to && { to: params.to }),
+          ...(params.reason && { reason: params.reason })
+        };
+      }
+
+      const refunds = await this.omiseClient.get<OmiseListResponse<OmiseRefund>>(endpoint, queryParams);
 
       return {
         success: true,
