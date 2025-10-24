@@ -201,11 +201,10 @@ export class TransferTools {
   }
 
   private validateRecipientId(recipientId: string): boolean {
-    // Omise recipient ID format (official):
-    // Test: recp_test_xxxxxxx... (lowercase alphanumeric, variable length)
-    // Live: recp_xxxxxxx... (lowercase alphanumeric, variable length)
-    // Pattern: /recp(_test)?_[0-9a-z]+/
-    return /^recp_(test_)?[0-9a-z]+$/.test(recipientId);
+    // Omise recipient ID format:
+    // Test: recp_test_xxxxxxxxxxxxxxxx (19 chars after test_)
+    // Live: recp_xxxxxxxxxxxxxxxx (19 chars after recp_)
+    return /^recp_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(recipientId);
   }
 
   private validateCurrency(currency: string): boolean {
@@ -288,7 +287,7 @@ export class TransferTools {
       if (!this.validateRecipientId(params.recipient)) {
         return {
           success: false,
-          error: 'Invalid recipient ID format. Must be in format: recp_xxxxxxx (live) or recp_test_xxxxxxx (test)'
+          error: 'Invalid recipient ID format. Must be in format: recp_xxxxxxxxxxxxxxxx (19 chars)'
         };
       }
 

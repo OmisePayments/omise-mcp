@@ -127,7 +127,7 @@ export function createMockTransfer(overrides: any = {}) {
     currency: overrides.currency || 'THB',
     description: overrides.description || faker.lorem.sentence(),
     status: overrides.status || 'sent',
-    recipient: overrides.recipient || `recp_${faker.string.alphanumeric(16).toLowerCase()}`,
+    recipient: overrides.recipient || `recp_${faker.string.alphanumeric(19)}`,
     metadata: overrides.metadata || {},
     ...overrides
   };
@@ -139,7 +139,7 @@ export function createMockTransfer(overrides: any = {}) {
 export function createMockRecipient(overrides: any = {}) {
   return {
     object: 'recipient',
-    id: overrides.id || `recp_${faker.string.alphanumeric(16).toLowerCase()}`,
+    id: overrides.id || `recp_${faker.string.alphanumeric(19)}`,
     livemode: false,
     location: `/recipients/${overrides.id || faker.string.alphanumeric(16)}`,
     created: faker.date.past().toISOString(),
