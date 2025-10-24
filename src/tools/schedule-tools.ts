@@ -291,16 +291,16 @@ export class ScheduleTools {
 
   private validateScheduleId(scheduleId: string): boolean {
     // Omise schedule ID format:
-    // Test: schd_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: schd_xxxxxxxxxxxxxxxx (19 chars after schd_)
-    return /^schd_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(scheduleId);
+    // Test: schd_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: schd_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^schd_(test_)?[0-9a-z]{19}$/.test(scheduleId);
   }
 
   private validateCustomerId(customerId: string): boolean {
     // Omise customer ID format:
-    // Test: cust_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: cust_xxxxxxxxxxxxxxxx (19 chars after cust_)
-    return /^cust_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(customerId);
+    // Test: cust_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: cust_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^cust_(test_)?[0-9a-z]{19}$/.test(customerId);
   }
 
   private validateCurrency(currency: string): boolean {

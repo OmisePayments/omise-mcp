@@ -21,4 +21,7 @@ logs/
 .env*
 
 # Configuration files (contain sensitive API keys)
-config/
+# Ignore all files in config/ directory
+config/*
+# But allow .example template files to be committed
+!config/*.example

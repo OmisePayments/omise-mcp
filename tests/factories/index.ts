@@ -10,9 +10,9 @@ import { faker } from '@faker-js/faker';
 export function createMockCharge(overrides: any = {}) {
   return {
     object: 'charge',
-    id: overrides.id || `chrg_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `chrg_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/charges/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/charges/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -23,10 +23,10 @@ export function createMockCharge(overrides: any = {}) {
     capture: overrides.capture ?? true,
     authorized: overrides.authorized ?? true,
     paid: overrides.paid ?? true,
-    transaction: overrides.transaction || `trxn_${faker.string.alphanumeric(16)}`,
+    transaction: overrides.transaction || `trxn_${faker.string.alphanumeric(19).toLowerCase()}`,
     card: overrides.card || createMockCard(),
     source: overrides.source || null,
-    customer: overrides.customer || `cust_${faker.string.alphanumeric(16)}`,
+    customer: overrides.customer || `cust_${faker.string.alphanumeric(19).toLowerCase()}`,
     ip: overrides.ip || faker.internet.ip(),
     failure_code: overrides.failure_code || null,
     failure_message: overrides.failure_message || null,
@@ -43,15 +43,15 @@ export function createMockCharge(overrides: any = {}) {
 export function createMockCustomer(overrides: any = {}) {
   return {
     object: 'customer',
-    id: overrides.id || `cust_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `cust_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/customers/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/customers/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
     email: overrides.email || faker.internet.email(),
     description: overrides.description || faker.lorem.sentence(),
-    default_card: overrides.default_card || `card_${faker.string.alphanumeric(16)}`,
+    default_card: overrides.default_card || `card_${faker.string.alphanumeric(19).toLowerCase()}`,
     cards: overrides.cards || {
       object: 'list',
       data: Array.from({ length: 3 }, () => createMockCard()),
@@ -59,7 +59,7 @@ export function createMockCustomer(overrides: any = {}) {
       limit: 20,
       offset: 0,
       order: 'chronological',
-      location: `/customers/${overrides.id || faker.string.alphanumeric(16)}/cards`
+      location: `/customers/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}/cards`
     },
     metadata: overrides.metadata || {},
     ...overrides
@@ -72,9 +72,9 @@ export function createMockCustomer(overrides: any = {}) {
 export function createMockCard(overrides: any = {}) {
   return {
     object: 'card',
-    id: overrides.id || `card_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `card_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/cards/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/cards/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -83,7 +83,7 @@ export function createMockCard(overrides: any = {}) {
     name: overrides.name || faker.person.fullName(),
     expiration_month: overrides.expiration_month || faker.number.int({ min: 1, max: 12 }),
     expiration_year: overrides.expiration_year || faker.number.int({ min: 2025, max: 2030 }),
-    fingerprint: overrides.fingerprint || faker.string.alphanumeric(40),
+    fingerprint: overrides.fingerprint || faker.string.alphanumeric(40).toLowerCase(),
     funding: overrides.funding || faker.helpers.arrayElement(['credit', 'debit', 'prepaid']),
     country: overrides.country || faker.location.countryCode(),
     city: overrides.city || faker.location.city(),
@@ -99,9 +99,9 @@ export function createMockCard(overrides: any = {}) {
 export function createMockToken(overrides: any = {}) {
   return {
     object: 'token',
-    id: overrides.id || `tokn_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `tokn_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/tokens/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/tokens/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -117,9 +117,9 @@ export function createMockToken(overrides: any = {}) {
 export function createMockTransfer(overrides: any = {}) {
   return {
     object: 'transfer',
-    id: overrides.id || `trsf_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `trsf_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/transfers/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/transfers/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -127,7 +127,7 @@ export function createMockTransfer(overrides: any = {}) {
     currency: overrides.currency || 'THB',
     description: overrides.description || faker.lorem.sentence(),
     status: overrides.status || 'sent',
-    recipient: overrides.recipient || `rcpt_${faker.string.alphanumeric(16)}`,
+    recipient: overrides.recipient || `recp_${faker.string.alphanumeric(19).toLowerCase()}`,
     metadata: overrides.metadata || {},
     ...overrides
   };
@@ -139,9 +139,9 @@ export function createMockTransfer(overrides: any = {}) {
 export function createMockRecipient(overrides: any = {}) {
   return {
     object: 'recipient',
-    id: overrides.id || `rcpt_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `recp_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/recipients/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/recipients/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -168,9 +168,9 @@ export function createMockRecipient(overrides: any = {}) {
 export function createMockRefund(overrides: any = {}) {
   return {
     object: 'refund',
-    id: overrides.id || `rfnd_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `rfnd_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/refunds/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/refunds/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -178,8 +178,8 @@ export function createMockRefund(overrides: any = {}) {
     currency: overrides.currency || 'THB',
     status: overrides.status || 'closed',
     reason: overrides.reason || faker.helpers.arrayElement(['duplicate', 'fraudulent', 'requested_by_customer', 'expired_uncaptured_charge']),
-    charge: overrides.charge || `chrg_${faker.string.alphanumeric(16)}`,
-    transaction: overrides.transaction || `trxn_${faker.string.alphanumeric(16)}`,
+    charge: overrides.charge || `chrg_${faker.string.alphanumeric(19).toLowerCase()}`,
+    transaction: overrides.transaction || `trxn_${faker.string.alphanumeric(19).toLowerCase()}`,
     metadata: overrides.metadata || {},
     ...overrides
   };
@@ -191,9 +191,9 @@ export function createMockRefund(overrides: any = {}) {
 export function createMockDispute(overrides: any = {}) {
   return {
     object: 'dispute',
-    id: overrides.id || `dspt_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `dspt_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/disputes/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/disputes/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -201,7 +201,7 @@ export function createMockDispute(overrides: any = {}) {
     currency: overrides.currency || 'THB',
     status: overrides.status || faker.helpers.arrayElement(['open', 'pending', 'closed']),
     message: overrides.message || faker.lorem.sentence(),
-    charge: overrides.charge || `chrg_${faker.string.alphanumeric(16)}`,
+    charge: overrides.charge || `chrg_${faker.string.alphanumeric(19).toLowerCase()}`,
     metadata: overrides.metadata || {},
     ...overrides
   };
@@ -213,9 +213,9 @@ export function createMockDispute(overrides: any = {}) {
 export function createMockSchedule(overrides: any = {}) {
   return {
     object: 'schedule',
-    id: overrides.id || `schd_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `schd_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/schedules/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/schedules/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -238,9 +238,9 @@ export function createMockSchedule(overrides: any = {}) {
 export function createMockEvent(overrides: any = {}) {
   return {
     object: 'event',
-    id: overrides.id || `evnt_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `evnt_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/events/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/events/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -256,16 +256,16 @@ export function createMockEvent(overrides: any = {}) {
 export function createMockWebhookEndpoint(overrides: any = {}) {
   return {
     object: 'webhook_endpoint',
-    id: overrides.id || `wbhk_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `wbhk_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/webhook_endpoints/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/webhook_endpoints/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
     url: overrides.url || faker.internet.url(),
     description: overrides.description || faker.lorem.sentence(),
     events: overrides.events || ['charge.create', 'charge.complete'],
-    secret_key: overrides.secret_key || faker.string.alphanumeric(32),
+    secret_key: overrides.secret_key || faker.string.alphanumeric(32).toLowerCase(),
     status: overrides.status || faker.helpers.arrayElement(['active', 'inactive', 'disabled']),
     metadata: overrides.metadata || {},
     ...overrides
@@ -278,9 +278,9 @@ export function createMockWebhookEndpoint(overrides: any = {}) {
 export function createMockLink(overrides: any = {}) {
   return {
     object: 'link',
-    id: overrides.id || `link_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `link_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/links/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/links/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
@@ -304,9 +304,9 @@ export function createMockLink(overrides: any = {}) {
 export function createMockChain(overrides: any = {}) {
   return {
     object: 'chain',
-    id: overrides.id || `chn_${faker.string.alphanumeric(16)}`,
+    id: overrides.id || `chn_${faker.string.alphanumeric(19).toLowerCase()}`,
     livemode: false,
-    location: `/chains/${overrides.id || faker.string.alphanumeric(16)}`,
+    location: `/chains/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
     created: faker.date.past().toISOString(),
     created_at: faker.date.past().toISOString(),
     updated_at: faker.date.recent().toISOString(),
