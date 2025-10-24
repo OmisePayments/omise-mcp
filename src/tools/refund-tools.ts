@@ -77,12 +77,16 @@ export class RefundTools {
         inputSchema: {
           type: 'object',
           properties: {
+            charge_id: {
+              type: 'string',
+              description: 'Charge ID to retrieve'
+            },
             refund_id: {
               type: 'string',
               description: 'Refund ID to retrieve'
             }
           },
-          required: ['refund_id']
+          required: ['charge_id', 'refund_id']
         }
       },
       {
@@ -273,7 +277,7 @@ export class RefundTools {
         };
       }
 
-      const refund = await this.omiseClient.get<OmiseRefund>(`/refunds/${params.refund_id}`);
+      const refund = await this.omiseClient.get<OmiseRefund>(`/charges/${params.charge_id}/refunds/${params.refund_id}`);
 
       return {
         success: true,
