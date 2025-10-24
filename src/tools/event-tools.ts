@@ -142,7 +142,7 @@ export class EventTools {
       /^cust_[a-zA-Z0-9]{16}$/,  // customer
       /^card_[a-zA-Z0-9]{16}$/,  // card
       /^trsf_[a-zA-Z0-9]{16}$/,  // transfer
-      /^rcpt_[a-zA-Z0-9]{16}$/,  // recipient
+      /^recp_(test_)?[0-9a-z]+$/,  // recipient (test: recp_test_xxx, live: recp_xxx)
       /^rfnd_[a-zA-Z0-9]{16}$/,  // refund
       /^dspt_[a-zA-Z0-9]{16}$/,  // dispute
       /^schd_[a-zA-Z0-9]{16}$/,  // schedule
