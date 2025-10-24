@@ -32,6 +32,9 @@ export interface ServerConfig {
     maxRequests: number;
     windowMs: number;
   };
+  tools: {
+    allowed: string;
+  }
 }
 
 export interface ToolResult {

@@ -12,7 +12,8 @@ export function loadConfig(): ServerConfig {
   const requiredEnvVars = [
     'OMISE_PUBLIC_KEY',
     'OMISE_SECRET_KEY',
-    'OMISE_ENVIRONMENT'
+    'OMISE_ENVIRONMENT',
+    'TOOLS'
   ];
 
   // Check required environment variables
@@ -20,6 +21,16 @@ export function loadConfig(): ServerConfig {
     if (!process.env[envVar]) {
       throw new Error(`Missing required environment variable: ${envVar}`);
     }
+  }
+
+  // Additional validation for TOOLS
+  const toolsConfig = process.env.TOOLS;
+  if (!toolsConfig || toolsConfig.trim() === '') {
+      throw new Error(
+          'TOOLS environment variable is required. ' +
+          'Set TOOLS=all for full access, or specify comma-separated tool names. ' +
+          'Example: TOOLS=create_charge,list_charges,create_customer'
+      );
   }
 
   const environment = process.env.OMISE_ENVIRONMENT as 'production' | 'test';
@@ -56,6 +67,9 @@ export function loadConfig(): ServerConfig {
       enabled: process.env.RATE_LIMIT_ENABLED === 'true',
       maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
       windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10)
+    },
+    tools: {
+      allowed: toolsConfig
     }
   };
 }

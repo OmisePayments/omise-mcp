@@ -21,6 +21,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
+      - TOOLS=${TOOLS:-all}
       - LOG_LEVEL=info
       - LOG_FORMAT=json
       - OMISE_TIMEOUT=30000
