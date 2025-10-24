@@ -195,16 +195,16 @@ export class TransferTools {
 
   private validateTransferId(transferId: string): boolean {
     // Omise transfer ID format:
-    // Test: trsf_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: trsf_xxxxxxxxxxxxxxxx (19 chars after trsf_)
-    return /^trsf_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(transferId);
+    // Test: trsf_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: trsf_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^trsf_(test_)?[0-9a-z]{19}$/.test(transferId);
   }
 
   private validateRecipientId(recipientId: string): boolean {
     // Omise recipient ID format:
-    // Test: recp_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Live: recp_xxxxxxxxxxxxxxxx (19 chars after recp_)
-    return /^recp_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(recipientId);
+    // Test: recp_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Live: recp_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^recp_(test_)?[0-9a-z]{19}$/.test(recipientId);
   }
 
   private validateCurrency(currency: string): boolean {

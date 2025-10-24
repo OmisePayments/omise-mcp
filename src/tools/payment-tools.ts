@@ -249,9 +249,9 @@ export class PaymentTools {
 
   private validateChargeId(chargeId: string): boolean {
     // Omise charge ID format:
-    // Test: chrg_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: chrg_xxxxxxxxxxxxxxxx (19 chars after chrg_)
-    return /^chrg_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(chargeId);
+    // Test: chrg_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: chrg_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^chrg_(test_)?[0-9a-z]{19}$/.test(chargeId);
   }
 
   private validateAmount(amount: number, currency: string): boolean {

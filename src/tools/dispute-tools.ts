@@ -257,16 +257,16 @@ export class DisputeTools {
 
   private validateDisputeId(disputeId: string): boolean {
     // Omise dispute ID format:
-    // Test: dspt_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: dspt_xxxxxxxxxxxxxxxx (19 chars after dspt_)
-    return /^dspt_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(disputeId);
+    // Test: dspt_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: dspt_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^dspt_(test_)?[0-9a-z]{19}$/.test(disputeId);
   }
 
   private validateDocumentId(documentId: string): boolean {
     // Omise document ID format:
-    // Test: docu_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: docu_xxxxxxxxxxxxxxxx (19 chars after docu_)
-    return /^docu_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(documentId);
+    // Test: docu_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: docu_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^docu_(test_)?[0-9a-z]{19}$/.test(documentId);
   }
 
   private validateContentType(contentType: string): boolean {
