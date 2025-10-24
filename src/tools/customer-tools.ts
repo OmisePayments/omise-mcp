@@ -295,16 +295,16 @@ export class CustomerTools {
 
   private validateCustomerId(customerId: string): boolean {
     // Omise customer ID format:
-    // Test: cust_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: cust_xxxxxxxxxxxxxxxx (19 chars after cust_)
-    return /^cust_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(customerId);
+    // Test: cust_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: cust_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^cust_(test_)?[0-9a-z]{19}$/.test(customerId);
   }
 
   private validateCardId(cardId: string): boolean {
     // Omise card ID format:
-    // Test: card_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: card_xxxxxxxxxxxxxxxx (19 chars after card_)
-    return /^card_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(cardId);
+    // Test: card_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: card_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^card_(test_)?[0-9a-z]{19}$/.test(cardId);
   }
 
   private validateEmail(email: string): boolean {

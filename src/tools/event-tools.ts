@@ -115,9 +115,9 @@ export class EventTools {
 
   private validateEventId(eventId: string): boolean {
     // Omise event ID format:
-    // Test: evnt_test_xxxxxxxxxxxxxxxx (19 chars after test_)
-    // Production: evnt_xxxxxxxxxxxxxxxx (19 chars after evnt_)
-    return /^evnt_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/.test(eventId);
+    // Test: evnt_test_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    // Production: evnt_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^evnt_(test_)?[0-9a-z]{19}$/.test(eventId);
   }
 
   private validateEventType(eventType: string): boolean {
@@ -136,17 +136,17 @@ export class EventTools {
   }
 
   private validateResourceKey(key: string): boolean {
-    // Resource key format validation - all use 19 chars and support test_ prefix
+    // Resource key format validation - all use 19 lowercase alphanumeric chars
     const resourcePatterns = [
-      /^chrg_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // charge
-      /^cust_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // customer
-      /^card_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // card
-      /^trsf_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // transfer
-      /^recp_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // recipient
-      /^rfnd_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // refund
-      /^dspt_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // dispute
-      /^schd_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/,  // schedule
-      /^link_(test_[a-zA-Z0-9]{19}|[a-zA-Z0-9]{19})$/   // link
+      /^chrg_(test_)?[0-9a-z]{19}$/,  // charge
+      /^cust_(test_)?[0-9a-z]{19}$/,  // customer
+      /^card_(test_)?[0-9a-z]{19}$/,  // card
+      /^trsf_(test_)?[0-9a-z]{19}$/,  // transfer
+      /^recp_(test_)?[0-9a-z]{19}$/,  // recipient
+      /^rfnd_(test_)?[0-9a-z]{19}$/,  // refund
+      /^dspt_(test_)?[0-9a-z]{19}$/,  // dispute
+      /^schd_(test_)?[0-9a-z]{19}$/,  // schedule
+      /^link_(test_)?[0-9a-z]{19}$/   // link
     ];
     return resourcePatterns.some(pattern => pattern.test(key));
   }
