@@ -3,14 +3,14 @@
  */
 
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
-import { CustomerTools } from '../../src/tools/customer-tools';
-import { OmiseClient } from '../../src/utils/omise-client';
-import { Logger } from '../../src/utils/logger';
-import { createMockCustomer } from '../factories/index';
+import { CustomerTools } from '../../src/tools';
+import { OmiseClient } from '../../src/utils';
+import { Logger } from '../../src/utils';
+import { createMockCustomer } from '../factories';
 
 // モックの設定
-jest.mock('../../src/utils/omise-client.js');
-jest.mock('../../src/utils/logger.js');
+jest.mock('../../src/utils/omise-client');
+jest.mock('../../src/utils/logger');
 
 describe('CustomerTools', () => {
   let customerTools: CustomerTools;
@@ -24,7 +24,7 @@ describe('CustomerTools', () => {
   });
 
   describe('createCustomer', () => {
-    it('正常系: 顧客を作成できる', async () => {
+    it('should create a customer successfully', async () => {
       // Arrange
       const mockCustomer = createMockCustomer();
       mockOmiseClient.createCustomer.mockResolvedValue(mockCustomer);
@@ -43,11 +43,12 @@ describe('CustomerTools', () => {
       expect(result.message).toContain('Customer created successfully');
       expect(mockOmiseClient.createCustomer).toHaveBeenCalledWith({
         email: 'test@example.com',
-        description: 'Test customer'
+        description: 'Test customer',
+        metadata: {}
       });
     });
 
-    it('異常系: 無効なメールアドレスでエラー', async () => {
+    it('should fail with invalid email address', async () => {
       // Arrange
       const params = {
         email: 'invalid-email',
@@ -63,7 +64,7 @@ describe('CustomerTools', () => {
       expect(mockOmiseClient.createCustomer).not.toHaveBeenCalled();
     });
 
-    it('異常系: API呼び出しでエラー', async () => {
+    it('should fail when API call fails', async () => {
       // Arrange
       const params = {
         email: 'test@example.com',
@@ -82,13 +83,13 @@ describe('CustomerTools', () => {
   });
 
   describe('retrieveCustomer', () => {
-    it('正常系: 顧客を取得できる', async () => {
+    it('should retrieve a customer successfully', async () => {
       // Arrange
       const mockCustomer = createMockCustomer();
-      mockOmiseClient.get.mockResolvedValue(mockCustomer);
+      mockOmiseClient.getCustomer.mockResolvedValue(mockCustomer);
 
       const params = {
-        customer_id: 'cust_1234567890'
+        customer_id: 'cust_1234567890abcdefgha'
       };
 
       // Act
@@ -97,10 +98,10 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCustomer);
-      expect(mockOmiseClient.get).toHaveBeenCalledWith('/customers/cust_1234567890');
+      expect(mockOmiseClient.getCustomer).toHaveBeenCalledWith('cust_1234567890abcdefgha');
     });
 
-    it('異常系: 無効な顧客IDでエラー', async () => {
+    it('should fail with invalid customer ID', async () => {
       // Arrange
       const params = {
         customer_id: 'invalid_id'
@@ -117,18 +118,18 @@ describe('CustomerTools', () => {
   });
 
   describe('listCustomers', () => {
-    it('正常系: 顧客一覧を取得できる', async () => {
+    it('should list customers successfully', async () => {
       // Arrange
       const mockCustomers = {
-        object: 'list',
+        object: 'list' as const,
         data: [createMockCustomer(), createMockCustomer()],
         total: 2,
         limit: 20,
         offset: 0,
-        order: 'chronological',
+        order: 'chronological' as const,
         location: '/customers'
       };
-      mockOmiseClient.get.mockResolvedValue(mockCustomers);
+      mockOmiseClient.listCustomers.mockResolvedValue(mockCustomers);
 
       const params = {
         limit: 20,
@@ -141,18 +142,18 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCustomers);
-      expect(mockOmiseClient.get).toHaveBeenCalledWith('/customers', { limit: 20, offset: 0 });
+      expect(mockOmiseClient.listCustomers).toHaveBeenCalledWith({ limit: 20, offset: 0 });
     });
   });
 
   describe('updateCustomer', () => {
-    it('正常系: 顧客を更新できる', async () => {
+    it('should update a customer successfully', async () => {
       // Arrange
       const mockCustomer = createMockCustomer();
       mockOmiseClient.put.mockResolvedValue(mockCustomer);
 
       const params = {
-        customer_id: 'cust_1234567890',
+        customer_id: 'cust_1234567890abcdefgha',
         email: 'updated@example.com'
       };
 
@@ -162,15 +163,52 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCustomer);
-      expect(mockOmiseClient.put).toHaveBeenCalledWith('/customers/cust_1234567890', {
+      expect(mockOmiseClient.put).toHaveBeenCalledWith('/customers/cust_1234567890abcdefgha', {
         email: 'updated@example.com'
       });
     });
 
-    it('異常系: 更新データなしでエラー', async () => {
+    it('should add card to customer using token', async () => {
+      // Arrange
+      const mockCustomer = createMockCustomer();
+      mockOmiseClient.put.mockResolvedValue(mockCustomer);
+
+      const params = {
+        customer_id: 'cust_1234567890abcdefgha',
+        card: 'tokn_1234567890abcdefghi'
+      };
+
+      // Act
+      const result = await customerTools.updateCustomer(params);
+
+      // Assert
+      expect(result.success).toBe(true);
+      expect(result.data).toEqual(mockCustomer);
+      expect(mockOmiseClient.put).toHaveBeenCalledWith('/customers/cust_1234567890abcdefgha', {
+        card: 'tokn_1234567890abcdefghi'
+      });
+    });
+
+    it('should fail with invalid token ID', async () => {
       // Arrange
       const params = {
-        customer_id: 'cust_1234567890'
+        customer_id: 'cust_1234567890abcdefgha',
+        card: 'invalid_token'
+      };
+
+      // Act
+      const result = await customerTools.updateCustomer(params);
+
+      // Assert
+      expect(result.success).toBe(false);
+      expect(result.error).toContain('Invalid token ID format');
+      expect(mockOmiseClient.put).not.toHaveBeenCalled();
+    });
+
+    it('should fail with no update data', async () => {
+      // Arrange
+      const params = {
+        customer_id: 'cust_1234567890abcdefgha'
       };
 
       // Act
@@ -184,13 +222,13 @@ describe('CustomerTools', () => {
   });
 
   describe('destroyCustomer', () => {
-    it('正常系: 顧客を削除できる', async () => {
+    it('should delete a customer successfully', async () => {
       // Arrange
       const mockCustomer = createMockCustomer({ deleted: true });
       mockOmiseClient.delete.mockResolvedValue(mockCustomer);
 
       const params = {
-        customer_id: 'cust_1234567890',
+        customer_id: 'cust_1234567890abcdefgha',
         confirm: true
       };
 
@@ -200,13 +238,13 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCustomer);
-      expect(mockOmiseClient.delete).toHaveBeenCalledWith('/customers/cust_1234567890');
+      expect(mockOmiseClient.delete).toHaveBeenCalledWith('/customers/cust_1234567890abcdefgha');
     });
 
-    it('異常系: 確認なしでエラー', async () => {
+    it('should fail without confirmation for customer', async () => {
       // Arrange
       const params = {
-        customer_id: 'cust_1234567890'
+        customer_id: 'cust_1234567890abcdefgha'
       };
 
       // Act
@@ -220,7 +258,7 @@ describe('CustomerTools', () => {
   });
 
   describe('listCustomerCards', () => {
-    it('正常系: 顧客のカード一覧を取得できる', async () => {
+    it('should list customer cards successfully', async () => {
       // Arrange
       const mockCards = {
         object: 'list',
@@ -229,12 +267,12 @@ describe('CustomerTools', () => {
         limit: 20,
         offset: 0,
         order: 'chronological',
-        location: '/customers/cust_1234567890/cards'
+        location: '/customers/cust_1234567890abcdefgha/cards'
       };
       mockOmiseClient.get.mockResolvedValue(mockCards);
 
       const params = {
-        customer_id: 'cust_1234567890'
+        customer_id: 'cust_1234567890abcdefgha'
       };
 
       // Act
@@ -243,24 +281,24 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCards);
-      expect(mockOmiseClient.get).toHaveBeenCalledWith('/customers/cust_1234567890/cards', {});
+      expect(mockOmiseClient.get).toHaveBeenCalledWith('/customers/cust_1234567890abcdefgha/cards', { limit: 20, offset: 0 });
     });
   });
 
   describe('retrieveCustomerCard', () => {
-    it('正常系: 顧客のカードを取得できる', async () => {
+    it('should retrieve a customer card successfully', async () => {
       // Arrange
       const mockCard = {
         object: 'card',
-        id: 'card_1234567890',
+        id: 'card_1234567890abcdefgha',
         brand: 'Visa',
         last_digits: '1234'
       };
       mockOmiseClient.get.mockResolvedValue(mockCard);
 
       const params = {
-        customer_id: 'cust_1234567890',
-        card_id: 'card_1234567890'
+        customer_id: 'cust_1234567890abcdefgha',
+        card_id: 'card_1234567890abcdefgha'
       };
 
       // Act
@@ -269,24 +307,24 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCard);
-      expect(mockOmiseClient.get).toHaveBeenCalledWith('/customers/cust_1234567890/cards/card_1234567890');
+      expect(mockOmiseClient.get).toHaveBeenCalledWith('/customers/cust_1234567890abcdefgha/cards/card_1234567890abcdefgha');
     });
   });
 
   describe('updateCustomerCard', () => {
-    it('正常系: 顧客のカードを更新できる', async () => {
+    it('should update a customer card successfully', async () => {
       // Arrange
       const mockCard = {
         object: 'card',
-        id: 'card_1234567890',
+        id: 'card_1234567890abcdefgha',
         brand: 'Visa',
         last_digits: '1234'
       };
       mockOmiseClient.put.mockResolvedValue(mockCard);
 
       const params = {
-        customer_id: 'cust_1234567890',
-        card_id: 'card_1234567890',
+        customer_id: 'cust_1234567890abcdefgha',
+        card_id: 'card_1234567890abcdefgha',
         name: 'Updated Name'
       };
 
@@ -296,25 +334,25 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCard);
-      expect(mockOmiseClient.put).toHaveBeenCalledWith('/customers/cust_1234567890/cards/card_1234567890', {
+      expect(mockOmiseClient.put).toHaveBeenCalledWith('/customers/cust_1234567890abcdefgha/cards/card_1234567890abcdefgha', {
         name: 'Updated Name'
       });
     });
   });
 
   describe('destroyCustomerCard', () => {
-    it('正常系: 顧客のカードを削除できる', async () => {
+    it('should delete a customer card successfully', async () => {
       // Arrange
       const mockCard = {
         object: 'card',
-        id: 'card_1234567890',
+        id: 'card_1234567890abcdefgha',
         deleted: true
       };
       mockOmiseClient.delete.mockResolvedValue(mockCard);
 
       const params = {
-        customer_id: 'cust_1234567890',
-        card_id: 'card_1234567890',
+        customer_id: 'cust_1234567890abcdefgha',
+        card_id: 'card_1234567890abcdefgha',
         confirm: true
       };
 
@@ -324,14 +362,14 @@ describe('CustomerTools', () => {
       // Assert
       expect(result.success).toBe(true);
       expect(result.data).toEqual(mockCard);
-      expect(mockOmiseClient.delete).toHaveBeenCalledWith('/customers/cust_1234567890/cards/card_1234567890');
+      expect(mockOmiseClient.delete).toHaveBeenCalledWith('/customers/cust_1234567890abcdefgha/cards/card_1234567890abcdefgha');
     });
 
-    it('異常系: 確認なしでエラー', async () => {
+    it('should fail without confirmation for customer', async () => {
       // Arrange
       const params = {
-        customer_id: 'cust_1234567890',
-        card_id: 'card_1234567890'
+        customer_id: 'cust_1234567890abcdefgha',
+        card_id: 'card_1234567890abcdefgha'
       };
 
       // Act
