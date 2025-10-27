@@ -48,12 +48,17 @@
     "testEnvironment": "node",
     "transform": {
       "^.+\\.ts$": ["ts-jest", {
-        "useESM": true
+        "useESM": true,
+        "tsconfig": {
+          "module": "ESNext",
+          "moduleResolution": "node"
+        }
       }]
     },
-    "moduleNameMapping": {
+    "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     },
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
     "extensionsToTreatAsEsm": [".ts"],
     "roots": [
       "<rootDir>/src",

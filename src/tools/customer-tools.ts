@@ -144,6 +144,10 @@ export class CustomerTools {
               type: 'string',
               description: 'Updated default card ID'
             },
+            card:{
+                type: 'string',
+                description: 'An unused token identifier to add as a new card to the customer.'
+            },
             metadata: {
               type: 'object',
               description: 'Updated metadata',
@@ -307,6 +311,12 @@ export class CustomerTools {
     return /^card_(test_)?[0-9a-z]{19}$/.test(cardId);
   }
 
+  private validateTokenId(tokenId: string): boolean {
+    // Validate token ID format
+    // Token format: tokn_xxxxxxxxxxxxxxxx (19 lowercase alphanumeric chars)
+    return /^tokn_(test_)?[0-9a-z]{19}$/.test(tokenId);
+  }
+
   private validateEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -450,6 +460,15 @@ export class CustomerTools {
       }
       if (params.default_card !== undefined) {
         updateData.default_card = params.default_card;
+      }
+      if (params.card !== undefined) {
+          if (!this.validateTokenId(params.card)) {
+              return {
+                  success: false,
+                  error: 'Invalid token ID format. Must be in format: tokn_xxxxxxxxxxxxxxxx'
+              };
+          }
+          updateData.card = params.card;
       }
       if (params.metadata !== undefined) {
         updateData.metadata = this.sanitizeMetadata(params.metadata);

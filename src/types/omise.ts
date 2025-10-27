@@ -541,6 +541,7 @@ export interface UpdateCustomerRequest {
   email?: string;
   description?: string;
   default_card?: string;
+  card?: string;
   metadata?: OmiseMetadata;
 }
 
