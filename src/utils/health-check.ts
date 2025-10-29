@@ -208,7 +208,7 @@ export class HealthChecker {
       const fs = await import('fs/promises');
       const stats = await fs.statfs('/');
       
-      const totalSpace = stats.bavail * stats.bsize;
+      const totalSpace = stats.blocks * stats.bsize;
       const freeSpace = stats.bavail * stats.bsize;
       const usedSpace = totalSpace - freeSpace;
       const diskUsagePercent = (usedSpace / totalSpace) * 100;
