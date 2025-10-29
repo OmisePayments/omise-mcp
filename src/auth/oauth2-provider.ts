@@ -13,6 +13,7 @@ export class OAuth2Provider {
   private clientRegistry: Map<string, OAuthClient>;
   private tokenStore: Map<string, TokenData>;
   private codeStore: Map<string, AuthorizationCode>;
+  private cleanupInterval?: NodeJS.Timeout;
 
   constructor(config: OAuth2Config, logger: Logger) {
     this.config = config;
@@ -306,7 +307,7 @@ export class OAuth2Provider {
    * Setup cleanup tasks for expired tokens and codes
    */
   private setupCleanupTasks(): void {
-    setInterval(() => {
+    this.cleanupInterval = setInterval(() => {
       const now = new Date();
       
       // Clean up expired tokens
@@ -323,6 +324,16 @@ export class OAuth2Provider {
         }
       }
     }, 60000); // Run every minute
+  }
+
+  /**
+   * Cleanup - stop all intervals and clear stores (useful for tests)
+   */
+  cleanup(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = undefined;
+    }
   }
 }
 
