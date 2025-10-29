@@ -1,5 +1,5 @@
 /**
- * Payment Tools 単体テスト
+ * Payment Tools Unit Tests
  */
 
 import { describe, it, expect, beforeEach, jest } from '@jest/globals';
@@ -8,7 +8,7 @@ import { OmiseClient } from '../../src/utils/omise-client';
 import { Logger } from '../../src/utils/logger';
 import { createMockCharge } from '../factories/index';
 
-// モックの設定
+// Mock setup
 jest.mock('../../src/utils/omise-client');
 jest.mock('../../src/utils/logger');
 
@@ -24,7 +24,7 @@ describe('PaymentTools', () => {
   });
 
   describe('createCharge', () => {
-    it('正常系: チャージを作成できる', async () => {
+    it('should create a charge successfully', async () => {
       // Arrange
       const mockCharge = createMockCharge();
       mockOmiseClient.createCharge.mockResolvedValue(mockCharge);
@@ -51,7 +51,7 @@ describe('PaymentTools', () => {
       });
     });
 
-    it('異常系: 無効な通貨コードでエラー', async () => {
+    it('should return error for invalid currency code', async () => {
       // Arrange
       const params = {
         amount: 1000,
@@ -68,7 +68,7 @@ describe('PaymentTools', () => {
       expect(mockOmiseClient.createCharge).not.toHaveBeenCalled();
     });
 
-    it('異常系: 無効な金額でエラー', async () => {
+    it('should return error for invalid amount', async () => {
       // Arrange
       const params = {
         amount: -100,
@@ -85,7 +85,7 @@ describe('PaymentTools', () => {
       expect(mockOmiseClient.createCharge).not.toHaveBeenCalled();
     });
 
-    it('異常系: API呼び出しでエラー', async () => {
+    it('should handle API call errors', async () => {
       // Arrange
       const params = {
         amount: 1000,
@@ -103,7 +103,7 @@ describe('PaymentTools', () => {
       expect(result.error).toBe('API Error');
     });
 
-    it('正常系: 部分キャプチャ用のチャージを作成できる (authorization_type=pre_auth)', async () => {
+    it('should create charge for partial capture (authorization_type=pre_auth)', async () => {
       // Arrange
       const mockCharge = createMockCharge({
         amount: 260000,
@@ -146,7 +146,7 @@ describe('PaymentTools', () => {
   });
 
   describe('retrieveCharge', () => {
-    it('正常系: チャージを取得できる', async () => {
+    it('should retrieve charge successfully', async () => {
       // Arrange
       const mockCharge = createMockCharge();
       mockOmiseClient.getCharge.mockResolvedValue(mockCharge);
@@ -164,7 +164,7 @@ describe('PaymentTools', () => {
       expect(mockOmiseClient.getCharge).toHaveBeenCalledWith('chrg_test_1234567890123456789');
     });
 
-    it('異常系: 無効なチャージIDでエラー', async () => {
+    it('should return error for invalid charge ID', async () => {
       // Arrange
       const params = {
         charge_id: 'invalid_id'
@@ -181,15 +181,15 @@ describe('PaymentTools', () => {
   });
 
   describe('listCharges', () => {
-    it('正常系: チャージ一覧を取得できる', async () => {
+    it('should list charges successfully', async () => {
       // Arrange
       const mockCharges = {
-        object: 'list',
+        object: 'list' as const,
         data: [createMockCharge(), createMockCharge()],
         total: 2,
         limit: 20,
         offset: 0,
-        order: 'chronological',
+        order: 'chronological' as const,
         location: '/charges'
       };
       mockOmiseClient.listCharges.mockResolvedValue(mockCharges);
@@ -208,15 +208,15 @@ describe('PaymentTools', () => {
       expect(mockOmiseClient.listCharges).toHaveBeenCalledWith({ limit: 20, offset: 0, order: 'chronological' });
     });
 
-    it('正常系: デフォルトパラメータで取得できる', async () => {
+    it('should list charges with default parameters', async () => {
       // Arrange
       const mockCharges = {
-        object: 'list',
+        object: 'list' as const,
         data: [],
         total: 0,
         limit: 20,
         offset: 0,
-        order: 'chronological',
+        order: 'chronological' as const,
         location: '/charges'
       };
       mockOmiseClient.listCharges.mockResolvedValue(mockCharges);
@@ -231,7 +231,7 @@ describe('PaymentTools', () => {
   });
 
   describe('updateCharge', () => {
-    it('正常系: チャージを更新できる', async () => {
+    it('should update charge successfully', async () => {
       // Arrange
       const mockCharge = createMockCharge();
       mockOmiseClient.put.mockResolvedValue(mockCharge);
@@ -252,7 +252,7 @@ describe('PaymentTools', () => {
       });
     });
 
-    it('異常系: 更新データなしでエラー', async () => {
+    it('should return error when no update data provided', async () => {
       // Arrange
       const params = {
         charge_id: 'chrg_test_1234567890123456789'
@@ -269,7 +269,7 @@ describe('PaymentTools', () => {
   });
 
   describe('captureCharge', () => {
-    it('正常系: チャージを確定できる', async () => {
+    it('should capture charge successfully', async () => {
       // Arrange
       const mockCharge = createMockCharge({ captured: true });
       mockOmiseClient.post.mockResolvedValue(mockCharge);
@@ -287,7 +287,7 @@ describe('PaymentTools', () => {
       expect(mockOmiseClient.post).toHaveBeenCalledWith('/charges/chrg_test_1234567890123456789/capture', {});
     });
 
-    it('正常系: 部分キャプチャができる (capture_amount指定)', async () => {
+    it('should perform partial capture (with capture_amount)', async () => {
       // Arrange
       const mockCharge = createMockCharge({
         amount: 260000,
@@ -321,7 +321,7 @@ describe('PaymentTools', () => {
       expect(result.data?.reversed).toBe(true);
     });
 
-    it('異常系: 無効な金額でエラー', async () => {
+    it('should return error for invalid capture amount', async () => {
       // Arrange
       const params = {
         charge_id: 'chrg_test_1234567890123456789',
@@ -337,7 +337,7 @@ describe('PaymentTools', () => {
       expect(mockOmiseClient.post).not.toHaveBeenCalled();
     });
 
-    it('異常系: 無効なチャージIDでエラー', async () => {
+    it('should return error for invalid charge ID in capture', async () => {
       // Arrange
       const params = {
         charge_id: 'invalid_id',
@@ -355,7 +355,7 @@ describe('PaymentTools', () => {
   });
 
   describe('reverseCharge', () => {
-    it('正常系: チャージを取消できる', async () => {
+    it('should reverse charge successfully', async () => {
       // Arrange
       const mockCharge = createMockCharge({ reversed: true });
       mockOmiseClient.post.mockResolvedValue(mockCharge);
@@ -375,7 +375,7 @@ describe('PaymentTools', () => {
   });
 
   describe('expireCharge', () => {
-    it('正常系: チャージを期限切れにできる', async () => {
+    it('should expire charge successfully', async () => {
       // Arrange
       const mockCharge = createMockCharge({ expired: true });
       mockOmiseClient.post.mockResolvedValue(mockCharge);
