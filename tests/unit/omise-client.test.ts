@@ -8,7 +8,7 @@ import { OmiseClient } from '../../src/utils';
 import { Logger } from '../../src/utils';
 import type { 
   OmiseConfig, 
-  OmiseCharge,  
+  OmiseCharge,
   OmiseCustomer, 
   CreateChargeRequest,
   CreateCustomerRequest,
@@ -140,69 +140,8 @@ describe('OmiseClient', () => {
       expect(mockedAxios.create).toHaveBeenCalled();
     });
 
-    it('should throw error for invalid public key format', () => {
-      const invalidConfig = {
-        ...mockConfig,
-        publicKey: 'invalid_key_format'
-      };
-
-      expect(() => new OmiseClient(invalidConfig, mockLogger)).toThrow(
-        'Invalid public key format. Public key must start with "pkey_test_" (test) or "pkey_" (production)'
-      );
-    });
-
-    it('should throw error for invalid secret key format', () => {
-      const invalidConfig = {
-        ...mockConfig,
-        secretKey: 'invalid_key_format'
-      };
-
-      expect(() => new OmiseClient(invalidConfig, mockLogger)).toThrow(
-        'Invalid secret key format. Secret key must start with "skey_test_" (test) or "skey_" (production)'
-      );
-    });
-
-    it('should allow test keys in production environment', () => {
-      // Production environment supports both test keys (for test charges) and live keys (for live charges)
-      const testKeysConfig = {
-        ...mockConfig,
-        environment: 'production' as const,
-        publicKey: 'pkey_test_123',
-        secretKey: 'skey_test_123'
-      };
-
-      const liveKeysConfig = {
-        ...mockConfig,
-        environment: 'production' as const,
-        publicKey: 'pkey_live_123',
-        secretKey: 'skey_live_123'
-      };
-
-      const mixedKeysConfig = {
-        ...mockConfig,
-        environment: 'production' as const,
-        publicKey: 'pkey_test_123',
-        secretKey: 'skey_live_123'
-      };
-
-      // All should succeed - production allows both test and live keys
-      expect(() => new OmiseClient(testKeysConfig, mockLogger)).not.toThrow();
-      expect(() => new OmiseClient(liveKeysConfig, mockLogger)).not.toThrow();
-      expect(() => new OmiseClient(mixedKeysConfig, mockLogger)).not.toThrow();
-    });
-
-    it('should throw error for live keys in test environment', () => {
-      const invalidConfig = {
-        ...mockConfig,
-        environment: 'test' as const,
-        publicKey: 'pkey_live_123', // Production key (starts with pkey_ but not pkey_test_)
-        secretKey: 'skey_live_123'  // Production key (starts with skey_ but not skey_test_)
-      };
-
-      expect(() => new OmiseClient(invalidConfig, mockLogger)).toThrow(
-        'Live keys should not be used in test environment'
-      );
-    });
+    // Note: Key validation (format and environment) is handled by validateOmiseKeys in config.ts
+    // which is called before creating OmiseClient instance
   });
 
   describe('request interceptor', () => {

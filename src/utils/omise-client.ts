@@ -40,9 +40,6 @@ export class OmiseClient {
     this.config = config;
     this.logger = logger;
     
-    // Validate API keys
-    this.validateKeys(config);
-    
     this.client = axios.create({
       baseURL: config.baseUrl,
       timeout: config.timeout,
@@ -58,36 +55,6 @@ export class OmiseClient {
     });
 
     this.setupInterceptors();
-  }
-
-  private validateKeys(config: OmiseConfig): void {
-    const { publicKey, secretKey, environment } = config;
-
-    // Validate public key format (must start with pkey_test_ for test or pkey_ for production)
-    const isValidPublicKey = publicKey.startsWith('pkey_test_') || 
-                            (publicKey.startsWith('pkey_') && !publicKey.startsWith('pkey_test_'));
-    if (!isValidPublicKey) {
-      throw new Error('Invalid public key format. Public key must start with "pkey_test_" (test) or "pkey_" (production)');
-    }
-
-    // Validate secret key format (must start with skey_test_ for test or skey_ for production)
-    const isValidSecretKey = secretKey.startsWith('skey_test_') || 
-                            (secretKey.startsWith('skey_') && !secretKey.startsWith('skey_test_'));
-    if (!isValidSecretKey) {
-      throw new Error('Invalid secret key format. Secret key must start with "skey_test_" (test) or "skey_" (production)');
-    }
-
-    // Prevent use of production keys in test environment
-    // Production keys start with pkey_/skey_ but NOT pkey_test_/skey_test_
-    // In production environment, both test keys and live keys are allowed
-    // (test keys for test charges, live keys for live charges)
-    if (environment === 'test') {
-      const isProductionPublicKey = publicKey.startsWith('pkey_') && !publicKey.startsWith('pkey_test_');
-      const isProductionSecretKey = secretKey.startsWith('skey_') && !secretKey.startsWith('skey_test_');
-      if (isProductionPublicKey || isProductionSecretKey) {
-        throw new Error('Live keys should not be used in test environment');
-      }
-    }
   }
 
   private setupInterceptors(): void {
