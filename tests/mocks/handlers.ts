@@ -18,28 +18,38 @@ import {
   createMockLink, 
   createMockChain, 
   createMockCapability 
-} from '../factories/index';
+} from '../factories';
 
 export const handlers = [
   // ============================================================================
   // Charge API Mock
   // ============================================================================
-  http.post('https://api.omise.co/charges', () => {
-    return HttpResponse.json(createMockCharge());
+  http.post('https://api.omise.co/charges', async ({ request }) => {
+    const body = await request.json() as any;
+    return HttpResponse.json(createMockCharge({
+      amount: body.amount,
+      currency: body.currency,
+      description: body.description,
+      customer: body.customer
+    }));
   }),
 
   http.get('https://api.omise.co/charges/:id', ({ params }) => {
     return HttpResponse.json(createMockCharge({ id: params.id as string }));
   }),
 
-  http.get('https://api.omise.co/charges', () => {
+  http.get('https://api.omise.co/charges', ({ request }) => {
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+    const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+    
     return HttpResponse.json({
       object: 'list',
-      data: Array.from({ length: 10 }, () => createMockCharge()),
+      data: Array.from({ length: Math.min(limit, 10) }, () => createMockCharge()),
       total: 10,
-      limit: 20,
-      offset: 0,
-      order: 'chronological',
+      limit,
+      offset,
+      order: url.searchParams.get('order') || 'chronological',
       location: '/charges'
     });
   }),
@@ -71,20 +81,29 @@ export const handlers = [
     return HttpResponse.json(createMockCustomer({ id: params.id as string }));
   }),
 
-  http.get('https://api.omise.co/customers', () => {
+  http.get('https://api.omise.co/customers', ({ request }) => {
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get('limit') || '20', 10);
+    const offset = parseInt(url.searchParams.get('offset') || '0', 10);
+    
     return HttpResponse.json({
       object: 'list',
-      data: Array.from({ length: 10 }, () => createMockCustomer()),
+      data: Array.from({ length: Math.min(limit, 10) }, () => createMockCustomer()),
       total: 10,
-      limit: 20,
-      offset: 0,
-      order: 'chronological',
+      limit,
+      offset,
+      order: url.searchParams.get('order') || 'chronological',
       location: '/customers'
     });
   }),
 
-  http.put('https://api.omise.co/customers/:id', ({ params }) => {
-    return HttpResponse.json(createMockCustomer({ id: params.id as string }));
+  http.put('https://api.omise.co/customers/:id', async ({ params, request }) => {
+    const body = await request.json() as any;
+    return HttpResponse.json(createMockCustomer({ 
+      id: params.id as string,
+      email: body.email,
+      description: body.description
+    }));
   }),
 
   http.delete('https://api.omise.co/customers/:id', ({ params }) => {
@@ -386,22 +405,29 @@ export const handlers = [
   // ============================================================================
   // Error Response Mock
   // ============================================================================
-  http.get('https://api.omise.co/charges/invalid-id', () => {
+  http.get('https://api.omise.co/charges/chrg_nonexistent', () => {
     return HttpResponse.json({
       object: 'error',
-      location: '/charges/invalid-id',
+      location: '/charges/chrg_nonexistent',
       code: 'not_found',
       message: 'Charge not found'
     }, { status: 404 });
   }),
 
-  http.post('https://api.omise.co/charges', () => {
-    return HttpResponse.json({
-      object: 'error',
-      location: '/charges',
-      code: 'invalid_card',
-      message: 'Invalid card information'
-    }, { status: 400 });
+  // Handle invalid charge creation (if needed for specific tests)
+  http.post('https://api.omise.co/charges', async ({ request }) => {
+    const body = await request.json() as any;
+    // If amount is invalid, return error
+    if (body.amount && body.amount < 0) {
+      return HttpResponse.json({
+        object: 'error',
+        location: '/charges',
+        code: 'invalid_request',
+        message: 'Invalid amount'
+      }, { status: 400 });
+    }
+    // Otherwise handled by main handler above
+    return;
   }),
 
   // ============================================================================
