@@ -10,6 +10,16 @@ export interface AgentIdentity {
   expiresAt: Date;
 }
 
+export interface AgentRegistrationInfo {
+  name: string;
+  organization?: string;
+  email?: string;
+  description?: string;
+  redirectUris: string[];
+  scopes?: string[];
+  grantTypes?: string[];
+}
+
 export interface OAuthConfig {
   authorizationEndpoint: string;
   tokenEndpoint: string;

@@ -58,6 +58,9 @@
     "moduleNameMapper": {
       "^(\\.{1,2}/.*)\\.js$": "$1"
     },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@faker-js|msw|until-async)/)"
+    ],
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
     "extensionsToTreatAsEsm": [".ts"],
     "roots": [

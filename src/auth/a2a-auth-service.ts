@@ -13,6 +13,7 @@ import {
   SecurityLevel,
   MessageType,
   AgentIdentity,
+  AgentRegistrationInfo,
   AuthenticationResult,
   SecurityPolicy,
   AuditLogEntry,
@@ -632,15 +633,6 @@ interface A2AServiceConfig {
   };
 }
 
-interface AgentRegistrationInfo {
-  name: string;
-  organization?: string;
-  email?: string;
-  description?: string;
-  redirectUris: string[];
-  scopes?: string[];
-  grantTypes?: string[];
-}
 
 interface AgentRegistrationResult {
   success: boolean;

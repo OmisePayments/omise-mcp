@@ -1,28 +1,58 @@
 /**
- * API統合テスト
+ * API Integration Tests
+ * 
+ * These tests mock the HTTP layer (axios) to test integration between
+ * components without hitting real APIs or external services.
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
-import { PaymentTools } from '../../src/tools/payment-tools';
-import { CustomerTools } from '../../src/tools/customer-tools';
-import { OmiseClient } from '../../src/utils/omise-client';
-import { Logger } from '../../src/utils/logger';
-import { createMockCharge, createMockCustomer } from '../factories/index';
+import { describe, it, expect, beforeAll, afterEach, jest } from '@jest/globals';
+import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
+import { PaymentTools } from '../../src/tools';
+import { CustomerTools } from '../../src/tools';
+import { OmiseClient } from '../../src/utils';
+import { Logger } from '../../src/utils';
+import { createMockCharge, createMockCustomer } from '../factories';
+
+// Mock axios
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
 
 describe('API Integration Tests', () => {
   let paymentTools: PaymentTools;
   let customerTools: CustomerTools;
   let omiseClient: OmiseClient;
   let logger: Logger;
+  let mockAxiosInstance: jest.Mocked<AxiosInstance>;
 
   beforeAll(() => {
-    // 統合テスト用の実際のクライアントを初期化
+    // Create mock axios instance
+    mockAxiosInstance = {
+      interceptors: {
+        request: {
+          use: jest.fn()
+        },
+        response: {
+          use: jest.fn()
+        }
+      },
+      get: jest.fn(),
+      post: jest.fn(),
+      put: jest.fn(),
+      delete: jest.fn(),
+      request: jest.fn()
+    } as any;
+
+    mockedAxios.create.mockReturnValue(mockAxiosInstance);
+
+    // Initialize client for integration tests
+    // All HTTP requests will be mocked via axios
     const config = {
       publicKey: 'pkey_test_1234567890',
       secretKey: 'skey_test_1234567890',
       environment: 'test' as const,
       apiVersion: '2017-11-02',
       baseUrl: 'https://api.omise.co',
+      vaultUrl: 'https://vault.omise.co',
       timeout: 30000,
       retryAttempts: 3,
       retryDelay: 1000
@@ -32,7 +62,8 @@ describe('API Integration Tests', () => {
       omise: config,
       server: { name: 'test', version: '1.0.0', description: 'Test', port: 3000, host: 'localhost' },
       logging: { level: 'error', format: 'simple', enableRequestLogging: false, enableResponseLogging: false },
-      rateLimit: { enabled: false, maxRequests: 100, windowMs: 60000 }
+      rateLimit: { enabled: false, maxRequests: 100, windowMs: 60000 },
+      tools: { allowed: 'all' }
     });
 
     omiseClient = new OmiseClient(config, logger);
@@ -40,50 +71,103 @@ describe('API Integration Tests', () => {
     customerTools = new CustomerTools(omiseClient, logger);
   });
 
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   describe('Payment Flow Integration', () => {
-    it('顧客作成 → チャージ作成の統合テスト', async () => {
-      // 1. 顧客を作成
-      const customerParams = {
+    it('should create customer and charge integration test', async () => {
+      // Mock customer creation
+      const mockCustomer = createMockCustomer({
         email: 'integration-test@example.com',
         description: 'Integration test customer'
-      };
+      });
 
-      const customerResult = await customerTools.createCustomer(customerParams);
+      mockAxiosInstance.post.mockResolvedValueOnce({
+        data: mockCustomer,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 1. Create customer
+      const customerResult = await customerTools.createCustomer({
+        email: 'integration-test@example.com',
+        description: 'Integration test customer'
+      });
+      
       expect(customerResult.success).toBe(true);
       expect(customerResult.data).toBeDefined();
-
       const customerId = customerResult.data?.id;
       expect(customerId).toBeDefined();
 
-      // 2. 顧客のチャージを作成
-      const chargeParams = {
+      // Mock charge creation
+      const mockCharge = createMockCharge({
         amount: 1000,
         currency: 'THB',
         customer: customerId,
         description: 'Integration test charge'
-      };
+      });
 
-      const chargeResult = await paymentTools.createCharge(chargeParams);
+      mockAxiosInstance.post.mockResolvedValueOnce({
+        data: mockCharge,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 2. Create charge for customer
+      const chargeResult = await paymentTools.createCharge({
+        amount: 1000,
+        currency: 'THB',
+        customer: customerId,
+        description: 'Integration test charge'
+      });
+
       expect(chargeResult.success).toBe(true);
       expect(chargeResult.data).toBeDefined();
       expect(chargeResult.data?.customer).toBe(customerId);
     });
 
-    it('チャージ作成 → 返金の統合テスト', async () => {
-      // 1. チャージを作成
-      const chargeParams = {
+    it('should create charge and retrieve integration test', async () => {
+      // Mock charge creation
+      const mockCharge = createMockCharge({
         amount: 1000,
         currency: 'THB',
         description: 'Integration test charge for refund'
-      };
+      });
 
-      const chargeResult = await paymentTools.createCharge(chargeParams);
+      mockAxiosInstance.post.mockResolvedValueOnce({
+        data: mockCharge,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 1. Create charge
+      const chargeResult = await paymentTools.createCharge({
+        amount: 1000,
+        currency: 'THB',
+        description: 'Integration test charge for refund'
+      });
+
       expect(chargeResult.success).toBe(true);
-
       const chargeId = chargeResult.data?.id;
       expect(chargeId).toBeDefined();
 
-      // 2. チャージを取得して確認
+      // Mock charge retrieval
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: mockCharge,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 2. Retrieve charge to verify
       const retrieveResult = await paymentTools.retrieveCharge({ charge_id: chargeId });
       expect(retrieveResult.success).toBe(true);
       expect(retrieveResult.data?.id).toBe(chargeId);
@@ -91,31 +175,66 @@ describe('API Integration Tests', () => {
   });
 
   describe('Customer Management Integration', () => {
-    it('顧客作成 → 更新 → 削除の統合テスト', async () => {
-      // 1. 顧客を作成
-      const createParams = {
+    it('should create, update, and retrieve customer integration test', async () => {
+      // Mock customer creation
+      const mockCustomer = createMockCustomer({
         email: 'integration-crud@example.com',
         description: 'Integration CRUD test customer'
-      };
+      });
 
-      const createResult = await customerTools.createCustomer(createParams);
+      mockAxiosInstance.post.mockResolvedValueOnce({
+        data: mockCustomer,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 1. Create customer
+      const createResult = await customerTools.createCustomer({
+        email: 'integration-crud@example.com',
+        description: 'Integration CRUD test customer'
+      });
+
       expect(createResult.success).toBe(true);
-
       const customerId = createResult.data?.id;
       expect(customerId).toBeDefined();
 
-      // 2. 顧客を更新
-      const updateParams = {
+      // Mock customer update
+      const updatedCustomer = createMockCustomer({
+        id: customerId,
+        email: 'updated-integration@example.com',
+        description: 'Updated integration test customer'
+      });
+
+      mockAxiosInstance.put.mockResolvedValueOnce({
+        data: updatedCustomer,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 2. Update customer
+      const updateResult = await customerTools.updateCustomer({
         customer_id: customerId,
         email: 'updated-integration@example.com',
         description: 'Updated integration test customer'
-      };
+      });
 
-      const updateResult = await customerTools.updateCustomer(updateParams);
       expect(updateResult.success).toBe(true);
       expect(updateResult.data?.email).toBe('updated-integration@example.com');
 
-      // 3. 顧客を取得して確認
+      // Mock customer retrieval
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: updatedCustomer,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 3. Retrieve customer to verify
       const retrieveResult = await customerTools.retrieveCustomer({ customer_id: customerId });
       expect(retrieveResult.success).toBe(true);
       expect(retrieveResult.data?.email).toBe('updated-integration@example.com');
@@ -123,8 +242,27 @@ describe('API Integration Tests', () => {
   });
 
   describe('List Operations Integration', () => {
-    it('顧客一覧 → チャージ一覧の統合テスト', async () => {
-      // 1. 顧客一覧を取得
+    it('should test customer list and charge list integration', async () => {
+      // Mock customer list
+      const mockCustomersList = {
+        object: 'list',
+        data: Array.from({ length: 5 }, () => createMockCustomer()),
+        total: 10,
+        limit: 5,
+        offset: 0,
+        order: 'chronological',
+        location: '/customers'
+      };
+
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: mockCustomersList,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 1. Get customer list
       const customersResult = await customerTools.listCustomers({
         limit: 5,
         offset: 0
@@ -134,7 +272,26 @@ describe('API Integration Tests', () => {
       expect(customersResult.data).toBeDefined();
       expect(Array.isArray(customersResult.data?.data)).toBe(true);
 
-      // 2. チャージ一覧を取得
+      // Mock charge list
+      const mockChargesList = {
+        object: 'list',
+        data: Array.from({ length: 5 }, () => createMockCharge()),
+        total: 10,
+        limit: 5,
+        offset: 0,
+        order: 'chronological',
+        location: '/charges'
+      };
+
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: mockChargesList,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // 2. Get charge list
       const chargesResult = await paymentTools.listCharges({
         limit: 5,
         offset: 0
@@ -147,34 +304,76 @@ describe('API Integration Tests', () => {
   });
 
   describe('Error Handling Integration', () => {
-    it('存在しないリソースへのアクセス', async () => {
-      // 存在しないチャージIDで取得を試行
+    it('should handle access to non-existent resources', async () => {
+      // Mock 404 error
+      const errorResponse: AxiosError = {
+        response: {
+          data: {
+            object: 'error',
+            code: 'not_found',
+            message: 'Charge not found'
+          },
+          status: 404,
+          statusText: 'Not Found',
+          headers: {},
+          config: {} as any
+        },
+        config: {} as any,
+        message: 'Request failed with status code 404',
+        name: 'AxiosError',
+        isAxiosError: true,
+        toJSON: () => ({})
+      };
+
+      mockAxiosInstance.get.mockRejectedValueOnce(errorResponse);
+
+      // Try to retrieve with non-existent charge ID
       const result = await paymentTools.retrieveCharge({
         charge_id: 'chrg_nonexistent'
       });
 
-      // エラーレスポンスを期待
+      // Expect error response
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
     });
 
-    it('無効なパラメータでの作成', async () => {
-      // 無効な金額でチャージ作成を試行
+    it('should handle creation with invalid parameters', async () => {
+      // This should be caught by validation before API call
+      // Try to create charge with invalid amount
       const result = await paymentTools.createCharge({
         amount: -100,
         currency: 'THB',
         description: 'Invalid amount test'
       });
 
-      // バリデーションエラーを期待
+      // Expect validation error (no API call made)
       expect(result.success).toBe(false);
       expect(result.error).toContain('Invalid amount');
     });
   });
 
   describe('Pagination Integration', () => {
-    it('ページネーション機能のテスト', async () => {
-      // 1ページ目を取得
+    it('should test pagination functionality', async () => {
+      // Mock first page
+      const firstPageList = {
+        object: 'list',
+        data: Array.from({ length: 2 }, () => createMockCustomer()),
+        total: 10,
+        limit: 2,
+        offset: 0,
+        order: 'chronological',
+        location: '/customers'
+      };
+
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: firstPageList,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // Get first page
       const firstPage = await customerTools.listCustomers({
         limit: 2,
         offset: 0
@@ -184,7 +383,26 @@ describe('API Integration Tests', () => {
       expect(firstPage.data?.limit).toBe(2);
       expect(firstPage.data?.offset).toBe(0);
 
-      // 2ページ目を取得
+      // Mock second page
+      const secondPageList = {
+        object: 'list',
+        data: Array.from({ length: 2 }, () => createMockCustomer()),
+        total: 10,
+        limit: 2,
+        offset: 2,
+        order: 'chronological',
+        location: '/customers'
+      };
+
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: secondPageList,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
+
+      // Get second page
       const secondPage = await customerTools.listCustomers({
         limit: 2,
         offset: 2
@@ -197,10 +415,29 @@ describe('API Integration Tests', () => {
   });
 
   describe('Filtering Integration', () => {
-    it('日付範囲フィルタリングのテスト', async () => {
+    it('should test date range filtering', async () => {
       const fromDate = new Date();
       fromDate.setDate(fromDate.getDate() - 30);
       const toDate = new Date();
+
+      // Mock filtered charge list
+      const filteredList = {
+        object: 'list',
+        data: Array.from({ length: 10 }, () => createMockCharge()),
+        total: 10,
+        limit: 10,
+        offset: 0,
+        order: 'chronological',
+        location: '/charges'
+      };
+
+      mockAxiosInstance.get.mockResolvedValueOnce({
+        data: filteredList,
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config: {} as any
+      } as AxiosResponse);
 
       const result = await paymentTools.listCharges({
         from: fromDate.toISOString(),
@@ -214,8 +451,27 @@ describe('API Integration Tests', () => {
   });
 
   describe('Concurrent Operations Integration', () => {
-    it('並行操作のテスト', async () => {
-      // 複数の顧客を並行して作成
+    it('should test concurrent operations', async () => {
+      // Mock multiple concurrent customer creations
+      const mockCustomers = Array.from({ length: 3 }, (_, index) =>
+        createMockCustomer({
+          email: `concurrent-test-${index}@example.com`,
+          description: `Concurrent test customer ${index}`
+        })
+      );
+
+      // Mock all POST requests for concurrent creation
+      mockCustomers.forEach(customer => {
+        mockAxiosInstance.post.mockResolvedValueOnce({
+          data: customer,
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config: {} as any
+        } as AxiosResponse);
+      });
+
+      // Create multiple customers concurrently
       const promises = Array.from({ length: 3 }, (_, index) => 
         customerTools.createCustomer({
           email: `concurrent-test-${index}@example.com`,
@@ -225,7 +481,7 @@ describe('API Integration Tests', () => {
 
       const results = await Promise.all(promises);
 
-      // すべての操作が成功することを確認
+      // Verify all operations succeeded
       results.forEach(result => {
         expect(result.success).toBe(true);
         expect(result.data).toBeDefined();

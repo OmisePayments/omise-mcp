@@ -312,7 +312,7 @@ export class TransferTools {
       return {
         success: true,
         data: transfer,
-        message: `Transfer created successfully with ID: ${transfer.id}`
+        message: transfer ? `Transfer created successfully with ID: ${transfer.id}` : 'Transfer created successfully'
       };
     } catch (error) {
       this.logger.error('Failed to create transfer via MCP tool', error as Error, params);
@@ -391,7 +391,7 @@ export class TransferTools {
         };
       }
 
-      if (params.amount && params.amount <= 0) {
+      if (params.amount !== undefined && params.amount <= 0) {
         return {
           success: false,
           error: 'Transfer amount must be positive'

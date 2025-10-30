@@ -1,11 +1,11 @@
 /**
- * テストデータファクトリー
+ * Test Data Factories
  */
 
 import { faker } from '@faker-js/faker';
 
 // ============================================================================
-// Charge ファクトリー
+// Charge Factory
 // ============================================================================
 export function createMockCharge(overrides: any = {}) {
   return {
@@ -38,7 +38,7 @@ export function createMockCharge(overrides: any = {}) {
 }
 
 // ============================================================================
-// Customer ファクトリー
+// Customer Factory
 // ============================================================================
 export function createMockCustomer(overrides: any = {}) {
   return {
@@ -67,7 +67,7 @@ export function createMockCustomer(overrides: any = {}) {
 }
 
 // ============================================================================
-// Card ファクトリー
+// Card Factory
 // ============================================================================
 export function createMockCard(overrides: any = {}) {
   return {
@@ -94,7 +94,7 @@ export function createMockCard(overrides: any = {}) {
 }
 
 // ============================================================================
-// Token ファクトリー
+// Token Factory
 // ============================================================================
 export function createMockToken(overrides: any = {}) {
   return {
@@ -112,7 +112,7 @@ export function createMockToken(overrides: any = {}) {
 }
 
 // ============================================================================
-// Transfer ファクトリー
+// Transfer Factory
 // ============================================================================
 export function createMockTransfer(overrides: any = {}) {
   return {
@@ -134,7 +134,7 @@ export function createMockTransfer(overrides: any = {}) {
 }
 
 // ============================================================================
-// Recipient ファクトリー
+// Recipient Factory
 // ============================================================================
 export function createMockRecipient(overrides: any = {}) {
   return {
@@ -163,7 +163,7 @@ export function createMockRecipient(overrides: any = {}) {
 }
 
 // ============================================================================
-// Refund ファクトリー
+// Refund Factory
 // ============================================================================
 export function createMockRefund(overrides: any = {}) {
   return {
@@ -186,7 +186,7 @@ export function createMockRefund(overrides: any = {}) {
 }
 
 // ============================================================================
-// Dispute ファクトリー
+// Dispute Factory
 // ============================================================================
 export function createMockDispute(overrides: any = {}) {
   return {
@@ -208,7 +208,43 @@ export function createMockDispute(overrides: any = {}) {
 }
 
 // ============================================================================
-// Schedule ファクトリー
+// Dispute Document Factory
+// ============================================================================
+export function createMockDisputeDocument(overrides: any = {}) {
+  return {
+    object: 'dispute_document',
+    id: overrides.id || `docu_${faker.string.alphanumeric(19).toLowerCase()}`,
+    filename: overrides.filename || faker.system.fileName(),
+    created: overrides.created || faker.date.past().toISOString(),
+    ...overrides
+  };
+}
+
+// ============================================================================
+// Event Factory
+// ============================================================================
+export function createMockEvent(overrides: any = {}) {
+  return {
+    object: 'event',
+    id: overrides.id || `evnt_${faker.string.alphanumeric(19).toLowerCase()}`,
+    livemode: false,
+    location: `/events/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
+    created: overrides.created || faker.date.past().toISOString(),
+    created_at: overrides.created_at || faker.date.past().toISOString(),
+    updated_at: overrides.updated_at || faker.date.recent().toISOString(),
+    key: overrides.key || `chrg_${faker.string.alphanumeric(19).toLowerCase()}`,
+    data: overrides.data || {
+      object: 'charge',
+      id: `chrg_${faker.string.alphanumeric(19).toLowerCase()}`,
+      livemode: false,
+      created: faker.date.past().toISOString()
+    },
+    ...overrides
+  };
+}
+
+// ============================================================================
+// Schedule Factory
 // ============================================================================
 export function createMockSchedule(overrides: any = {}) {
   return {
@@ -233,25 +269,7 @@ export function createMockSchedule(overrides: any = {}) {
 }
 
 // ============================================================================
-// Event ファクトリー
-// ============================================================================
-export function createMockEvent(overrides: any = {}) {
-  return {
-    object: 'event',
-    id: overrides.id || `evnt_${faker.string.alphanumeric(19).toLowerCase()}`,
-    livemode: false,
-    location: `/events/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
-    created: faker.date.past().toISOString(),
-    created_at: faker.date.past().toISOString(),
-    updated_at: faker.date.recent().toISOString(),
-    key: overrides.key || faker.helpers.arrayElement(['charge.create', 'charge.complete', 'customer.create', 'transfer.create']),
-    data: overrides.data || createMockCharge(),
-    ...overrides
-  };
-}
-
-// ============================================================================
-// Webhook Endpoint ファクトリー
+// Webhook Endpoint Factory
 // ============================================================================
 export function createMockWebhookEndpoint(overrides: any = {}) {
   return {
@@ -273,7 +291,7 @@ export function createMockWebhookEndpoint(overrides: any = {}) {
 }
 
 // ============================================================================
-// Link ファクトリー
+// Link Factory
 // ============================================================================
 export function createMockLink(overrides: any = {}) {
   return {
@@ -299,7 +317,7 @@ export function createMockLink(overrides: any = {}) {
 }
 
 // ============================================================================
-// Chain ファクトリー
+// Chain Factory
 // ============================================================================
 export function createMockChain(overrides: any = {}) {
   return {
@@ -329,7 +347,31 @@ export function createMockChain(overrides: any = {}) {
 }
 
 // ============================================================================
-// Capability ファクトリー
+// Source Factory
+// ============================================================================
+export function createMockSource(overrides: any = {}) {
+  return {
+    object: 'source',
+    id: overrides.id || `src_${faker.string.alphanumeric(19).toLowerCase()}`,
+    livemode: false,
+    location: `/sources/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
+    created: faker.date.past().toISOString(),
+    created_at: faker.date.past().toISOString(),
+    updated_at: faker.date.recent().toISOString(),
+    type: overrides.type || faker.helpers.arrayElement(['internet_banking_scb', 'alipay', 'promptpay', 'truemoney']),
+    flow: overrides.flow || faker.helpers.arrayElement(['redirect', 'offline', 'offline_auto']),
+    amount: overrides.amount || faker.number.int({ min: 100, max: 100000 }),
+    currency: overrides.currency || 'THB',
+    charge_status: overrides.charge_status || faker.helpers.arrayElement(['unknown', 'failed', 'expired', 'pending', 'reversed', 'successful']),
+    receipt: overrides.receipt || null,
+    references: overrides.references || null,
+    metadata: overrides.metadata || {},
+    ...overrides
+  };
+}
+
+// ============================================================================
+// Capability Factory
 // ============================================================================
 export function createMockCapability(overrides: any = {}) {
   return {
