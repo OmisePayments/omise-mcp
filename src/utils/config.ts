@@ -77,16 +77,14 @@ export function loadConfig(): ServerConfig {
 export function validateOmiseKeys(config: ServerConfig): void {
   const { publicKey, secretKey, environment } = config.omise;
   
-  // Prevent use of test keys in production environment
-  if (environment === 'production') {
-    if (publicKey.startsWith('pkey_test_') || secretKey.startsWith('skey_test_')) {
-      throw new Error('Test keys cannot be used in production environment');
-    }
-  }
-  
-  // Prevent use of production keys in test environment
+  // In production environment, both test keys and live keys are allowed
+  // (test keys for test charges, live keys for live charges)
+  // Only prevent use of production keys in test environment
+  // Production keys start with pkey_/skey_ but NOT pkey_test_/skey_test_
   if (environment === 'test') {
-    if (publicKey.startsWith('pkey_live_') || secretKey.startsWith('skey_live_')) {
+    const isProductionPublicKey = publicKey.startsWith('pkey_') && !publicKey.startsWith('pkey_test_');
+    const isProductionSecretKey = secretKey.startsWith('skey_') && !secretKey.startsWith('skey_test_');
+    if (isProductionPublicKey || isProductionSecretKey) {
       throw new Error('Live keys should not be used in test environment');
     }
   }

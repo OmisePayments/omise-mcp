@@ -3,11 +3,13 @@
  */
 
 import { jest } from '@jest/globals';
-import { Logger } from '../../src/utils/logger';
-import { OAuth2Provider } from '../../src/auth/oauth2-provider';
-import { MutualTLSProvider } from '../../src/auth/mutual-tls';
-import { A2ACommunication } from '../../src/auth/a2a-communication';
-import { A2AAuthService } from '../../src/auth/a2a-auth-service';
+import { Logger } from '../../src/utils';
+import { 
+  OAuth2Provider,
+  MutualTLSProvider,
+  A2ACommunication,
+  A2AAuthService
+} from '../../src/auth';
 import { 
   AgentIdentity, 
   TokenResponse, 
@@ -77,9 +79,9 @@ export const mockTokenResponse: TokenResponse = {
 
 export const mockAgentCertificate: AgentCertificate = {
   agentId: 'test-agent-001',
-  privateKey: Buffer.from('mock-private-key'),
-  certificate: 'mock-certificate-content',
-  caCertificate: Buffer.from('mock-ca-certificate'),
+  privateKey: Buffer.from('-----BEGIN PRIVATE KEY-----\nmock-private-key\n-----END PRIVATE KEY-----'),
+  certificate: '-----BEGIN CERTIFICATE-----\nmock-certificate-content\n-----END CERTIFICATE-----',
+  caCertificate: Buffer.from('-----BEGIN CERTIFICATE-----\nmock-ca-certificate\n-----END CERTIFICATE-----'),
   issuedAt: new Date(),
   expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
   serialNumber: '001'
@@ -122,13 +124,22 @@ export const mockSecurityMetrics: SecurityMetrics = {
   ]
 };
 
+export const mockAgentIdentity: AgentIdentity = {
+  clientId: 'test-client-001',
+  name: 'Test Agent',
+  scopes: ['read', 'write'],
+  issuedAt: new Date(),
+  expiresAt: new Date(Date.now() + 3600 * 1000)
+};
+
 // Mock successful responses
 export const mockSuccessfulResponses = {
   tokenResponse: mockTokenResponse,
   agentCertificate: mockAgentCertificate,
   a2aResponse: mockA2AResponse,
   healthCheckResult: mockHealthCheckResult,
-  securityMetrics: mockSecurityMetrics
+  securityMetrics: mockSecurityMetrics,
+  agentIdentity: mockAgentIdentity
 };
 
 // Mock error responses
