@@ -194,14 +194,14 @@ describe('Tool Access Control Integration', () => {
     it('should support payment processing pattern', async () => {
       const { AccessControlService } = await import('../../src/auth/access-control');
       
-      const service = new AccessControlService('create_charge,retrieve_charge,capture_charge,create_customer,create_token');
+      const service = new AccessControlService('create_charge,retrieve_charge,capture_charge,create_customer,create_source');
       
       // Should allow payment operations
       expect(service.isToolAllowed('create_charge')).toBe(true);
       expect(service.isToolAllowed('retrieve_charge')).toBe(true);
       expect(service.isToolAllowed('capture_charge')).toBe(true);
       expect(service.isToolAllowed('create_customer')).toBe(true);
-      expect(service.isToolAllowed('create_token')).toBe(true);
+      expect(service.isToolAllowed('create_source')).toBe(true);
       
       // Should block unrelated operations
       expect(service.isToolAllowed('create_transfer')).toBe(false);

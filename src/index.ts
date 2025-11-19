@@ -15,7 +15,6 @@ import { OmiseClient } from './utils/omise-client.js';
 import { AccessControlService } from './auth/access-control.js';
 import { PaymentTools } from './tools/payment-tools.js';
 import { CustomerTools } from './tools/customer-tools.js';
-import { TokenTools } from './tools/token-tools.js';
 import { SourceTools } from './tools/source-tools.js';
 import { TransferTools } from './tools/transfer-tools.js';
 import { RecipientTools } from './tools/recipient-tools.js';
@@ -47,7 +46,6 @@ async function main() {
     // Initialize tools
     const paymentTools = new PaymentTools(omiseClient, logger);
     const customerTools = new CustomerTools(omiseClient, logger);
-    const tokenTools = new TokenTools(omiseClient, logger);
     const sourceTools = new SourceTools(omiseClient, logger);
     const transferTools = new TransferTools(omiseClient, logger);
     const recipientTools = new RecipientTools(omiseClient, logger);
@@ -73,7 +71,6 @@ async function main() {
       const allTools = [
         ...paymentTools.getTools(),
         ...customerTools.getTools(),
-        ...tokenTools.getTools(),
         ...sourceTools.getTools(),
         ...transferTools.getTools(),
         ...recipientTools.getTools(),
@@ -144,8 +141,7 @@ async function main() {
       try {
         logger.info(`Executing tool: ${name}`, { 
           requestId, 
-          args: args ? Object.keys(args) : [],
-          rateLimitInfo: omiseClient.getRateLimitInfo()
+          args: args ? Object.keys(args) : []
         });
 
         let result;
@@ -200,13 +196,6 @@ async function main() {
             break;
           case 'destroy_customer_card':
             result = await customerTools.destroyCustomerCard(args as any);
-            break;
-          // Token API tools
-          case 'create_token':
-            result = await tokenTools.createToken(args as any);
-            break;
-          case 'retrieve_token':
-            result = await tokenTools.retrieveToken(args as any);
             break;
           // Source API tools
           case 'create_source':
@@ -326,8 +315,7 @@ async function main() {
         if (result.success) {
           logger.info(`Tool execution successful: ${name}`, { 
             requestId, 
-            duration,
-            rateLimitInfo: omiseClient.getRateLimitInfo()
+            duration
           });
           
           return {
@@ -404,7 +392,6 @@ async function main() {
       baseUrl: config.omise.baseUrl,
       supportedTools: serverInfo.supportedTools.length,
       supportedResources: serverInfo.supportedResources.length,
-      rateLimitEnabled: config.rateLimit.enabled,
       requestLogging: config.logging.enableRequestLogging,
       responseLogging: config.logging.enableResponseLogging
     });

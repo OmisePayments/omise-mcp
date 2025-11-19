@@ -7,12 +7,10 @@
 // ============================================================================
 
 export interface OmiseConfig {
-  publicKey: string;
   secretKey: string;
   environment: 'production' | 'test';
   apiVersion: string;
   baseUrl: string;
-  vaultUrl: string;
   timeout: number;
   retryAttempts: number;
   retryDelay: number;
