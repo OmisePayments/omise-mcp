@@ -233,13 +233,8 @@ const transfer = await mcpClient.callTool('create_transfer', {
 | `OMISE_SECRET_KEY` | Omise secret key | ✓ | - |
 | `OMISE_ENVIRONMENT` | Environment (test/production) | ✓ | - |
 | `TOOLS` | Comma-separated list of allowed tools or 'all' | ✓ | - |
-| `PORT` | Server port | - | 3000 |
-| `HOST` | Server host | - | localhost |
 | `LOG_LEVEL` | Log level | - | info |
 | `LOG_FORMAT` | Log format | - | simple |
-| `RATE_LIMIT_ENABLED` | Enable rate limiting | - | true |
-| `RATE_LIMIT_MAX_REQUESTS` | Maximum requests | - | 100 |
-| `RATE_LIMIT_WINDOW_MS` | Time window (ms) | - | 60000 |
 
 ### Obtaining Omise API Keys
 

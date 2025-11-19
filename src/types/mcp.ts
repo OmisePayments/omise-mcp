@@ -4,12 +4,10 @@
 
 export interface ServerConfig {
   omise: {
-    publicKey: string;
     secretKey: string;
     environment: 'production' | 'test';
     apiVersion: string;
     baseUrl: string;
-    vaultUrl: string;
     timeout: number;
     retryAttempts: number;
     retryDelay: number;
@@ -18,19 +16,12 @@ export interface ServerConfig {
     name: string;
     version: string;
     description: string;
-    port: number;
-    host: string;
   };
   logging: {
     level: 'error' | 'warn' | 'info' | 'debug';
     format: 'json' | 'simple';
     enableRequestLogging: boolean;
     enableResponseLogging: boolean;
-  };
-  rateLimit: {
-    enabled: boolean;
-    maxRequests: number;
-    windowMs: number;
   };
   tools: {
     allowed: string;
@@ -62,16 +53,6 @@ export interface CustomerToolParams {
   email?: string;
   description?: string;
   card_token?: string;
-}
-
-export interface TokenToolParams {
-  card_number: string;
-  card_name: string;
-  expiration_month: number;
-  expiration_year: number;
-  security_code?: string;
-  city?: string;
-  postal_code?: string;
 }
 
 export interface ServerInfo {

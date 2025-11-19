@@ -4,7 +4,6 @@
 
 export * from './payment-tools.js';
 export * from './customer-tools.js';
-export * from './token-tools.js';
 export * from './source-tools.js';
 export * from './transfer-tools.js';
 export * from './recipient-tools.js';

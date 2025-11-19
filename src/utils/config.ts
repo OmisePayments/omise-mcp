@@ -10,7 +10,6 @@ dotenv.config();
 
 export function loadConfig(): ServerConfig {
   const requiredEnvVars = [
-    'OMISE_PUBLIC_KEY',
     'OMISE_SECRET_KEY',
     'OMISE_ENVIRONMENT',
     'TOOLS'
@@ -40,12 +39,10 @@ export function loadConfig(): ServerConfig {
 
   return {
     omise: {
-      publicKey: process.env.OMISE_PUBLIC_KEY!,
       secretKey: process.env.OMISE_SECRET_KEY!,
       environment,
-      apiVersion: process.env.OMISE_API_VERSION || '2017-11-02',
+      apiVersion: process.env.OMISE_API_VERSION || '2019-05-29',
       baseUrl: process.env.OMISE_BASE_URL || 'https://api.omise.co',
-      vaultUrl: process.env.OMISE_VAULT_URL || 'https://vault.omise.co',
       timeout: parseInt(process.env.OMISE_TIMEOUT || '30000', 10),
       retryAttempts: parseInt(process.env.OMISE_RETRY_ATTEMPTS || '3', 10),
       retryDelay: parseInt(process.env.OMISE_RETRY_DELAY || '1000', 10)
@@ -53,20 +50,13 @@ export function loadConfig(): ServerConfig {
     server: {
       name: process.env.SERVER_NAME || 'omise-mcp-server',
       version: process.env.SERVER_VERSION || '1.0.0',
-      description: process.env.SERVER_DESCRIPTION || 'MCP Server for Omise Payment Integration',
-      port: parseInt(process.env.PORT || '3000', 10),
-      host: process.env.HOST || 'localhost'
+      description: process.env.SERVER_DESCRIPTION || 'MCP Server for Omise Payment Integration'
     },
     logging: {
       level: (process.env.LOG_LEVEL as any) || 'info',
       format: (process.env.LOG_FORMAT as any) || 'simple',
       enableRequestLogging: process.env.LOG_REQUESTS === 'true',
       enableResponseLogging: process.env.LOG_RESPONSES === 'true'
-    },
-    rateLimit: {
-      enabled: process.env.RATE_LIMIT_ENABLED === 'true',
-      maxRequests: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || '100', 10),
-      windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || '60000', 10)
     },
     tools: {
       allowed: toolsConfig
@@ -75,16 +65,15 @@ export function loadConfig(): ServerConfig {
 }
 
 export function validateOmiseKeys(config: ServerConfig): void {
-  const { publicKey, secretKey, environment } = config.omise;
+  const { secretKey, environment } = config.omise;
   
   // In production environment, both test keys and live keys are allowed
   // (test keys for test charges, live keys for live charges)
   // Only prevent use of production keys in test environment
-  // Production keys start with pkey_/skey_ but NOT pkey_test_/skey_test_
+  // Production keys start with skey_ but NOT skey_test_
   if (environment === 'test') {
-    const isProductionPublicKey = publicKey.startsWith('pkey_') && !publicKey.startsWith('pkey_test_');
     const isProductionSecretKey = secretKey.startsWith('skey_') && !secretKey.startsWith('skey_test_');
-    if (isProductionPublicKey || isProductionSecretKey) {
+    if (isProductionSecretKey) {
       throw new Error('Live keys should not be used in test environment');
     }
   }
@@ -99,7 +88,6 @@ export function getServerInfo(config: ServerConfig) {
       tools: [
         'create_charge', 'get_charge',
         'create_customer', 'get_customer',
-        'create_token', 'get_token',
         'create_transfer', 'get_transfer',
         'create_recipient', 'get_recipient',
         'create_refund', 'get_refund',
@@ -108,7 +96,7 @@ export function getServerInfo(config: ServerConfig) {
         'get_capability'
       ],
       resources: [
-        'charge', 'customer', 'card', 'token',
+        'charge', 'customer', 'card',
         'transfer', 'recipient', 'transaction',
         'refund', 'dispute', 'event', 'schedule',
         'source', 'capability'
@@ -117,7 +105,6 @@ export function getServerInfo(config: ServerConfig) {
     supportedTools: [
       'create_charge', 'get_charge',
       'create_customer', 'get_customer',
-      'create_token', 'get_token',
       'create_transfer', 'get_transfer',
       'create_recipient', 'get_recipient',
       'create_refund', 'get_refund',
@@ -126,7 +113,7 @@ export function getServerInfo(config: ServerConfig) {
       'get_capability'
     ],
     supportedResources: [
-      'charge', 'customer', 'card', 'token',
+      'charge', 'customer', 'card',
       'transfer', 'recipient', 'transaction',
       'refund', 'dispute', 'event', 'schedule',
       'source', 'capability'

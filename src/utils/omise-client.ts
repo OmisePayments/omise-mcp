@@ -7,10 +7,8 @@ import {
   OmiseConfig, 
   OmiseCharge, 
   OmiseCustomer, 
-  OmiseToken,
   CreateChargeRequest,
   CreateCustomerRequest,
-  CreateTokenRequest,
   OmiseResponse,
   OmiseError,
   OmiseListResponse
@@ -318,58 +316,6 @@ export class OmiseClient {
       
       const response = await this.client.get<OmiseListResponse<OmiseCustomer>>('/customers', { params });
       
-      return response.data;
-    });
-  }
-
-  // ============================================================================
-  // Token API
-  // ============================================================================
-
-  async createToken(params: CreateTokenRequest): Promise<OmiseToken> {
-    return this.executeWithRetry(async () => {
-      this.logger.info('Creating token', { cardNumber: params.card.number.replace(/\d(?=\d{4})/g, '*') });
-      
-      // Token creation must use vault.omise.co domain, not api.omise.co
-      // AND must use public key for authentication, not secret key
-      const fullUrl = `${this.config.vaultUrl}/tokens`;
-      this.logger.info('Using vault URL for token creation', { vaultUrl: fullUrl });
-      
-      const response = await this.client.post<OmiseToken>(fullUrl, params, {
-        auth: {
-          username: this.config.publicKey,  // Use public key for token creation
-          password: ''
-        }
-      });
-      
-      // Token API returns the token directly, not wrapped in OmiseResponse
-      if (!response.data || !response.data.id) {
-        throw new Error(`Omise API Error: Invalid token response`);
-      }
-
-      this.logger.info('Token created successfully', { tokenId: response.data.id });
-      return response.data;
-    });
-  }
-
-  async getToken(tokenId: string): Promise<OmiseToken> {
-    return this.executeWithRetry(async () => {
-      this.logger.info('Retrieving token', { tokenId });
-      
-      // Token retrieval must also use vault.omise.co domain
-      const fullUrl = `${this.config.vaultUrl}/tokens/${tokenId}`;
-      const response = await this.client.get<OmiseToken>(fullUrl, {
-        auth: {
-          username: this.config.publicKey,  // Use public key for token operations
-          password: ''
-        }
-      });
-      
-      // Token API returns the token directly, not wrapped in OmiseResponse
-      if (!response.data || !response.data.id) {
-        throw new Error(`Omise API Error: Invalid token response`);
-      }
-
       return response.data;
     });
   }

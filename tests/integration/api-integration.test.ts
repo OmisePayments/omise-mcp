@@ -62,7 +62,6 @@ describe('API Integration Tests', () => {
       omise: config,
       server: { name: 'test', version: '1.0.0', description: 'Test', port: 3000, host: 'localhost' },
       logging: { level: 'error', format: 'simple', enableRequestLogging: false, enableResponseLogging: false },
-      rateLimit: { enabled: false, maxRequests: 100, windowMs: 60000 },
       tools: { allowed: 'all' }
     });
 

@@ -35,7 +35,6 @@ describe('Configuration Management', () => {
 
   function createValidTestEnv(): NodeJS.ProcessEnv {
     return {
-      OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
       OMISE_SECRET_KEY: 'skey_test_1234567890',
       OMISE_ENVIRONMENT: 'test',
       TOOLS: 'all'
@@ -44,7 +43,6 @@ describe('Configuration Management', () => {
 
   function createValidProductionEnv(): NodeJS.ProcessEnv {
     return {
-      OMISE_PUBLIC_KEY: 'pkey_live_1234567890',
       OMISE_SECRET_KEY: 'skey_live_1234567890',
       OMISE_ENVIRONMENT: 'production',
       TOOLS: 'create_charge,list_charges'
@@ -54,7 +52,6 @@ describe('Configuration Management', () => {
   function createFullEnv(): NodeJS.ProcessEnv {
     return {
       // Required variables
-      OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
       OMISE_SECRET_KEY: 'skey_test_1234567890',
       OMISE_ENVIRONMENT: 'test',
       TOOLS: 'all',
@@ -62,7 +59,6 @@ describe('Configuration Management', () => {
       // Optional Omise variables
       OMISE_API_VERSION: '2019-05-29',
       OMISE_BASE_URL: 'https://api.omise.co',
-      OMISE_VAULT_URL: 'https://vault.omise.co',
       OMISE_TIMEOUT: '45000',
       OMISE_RETRY_ATTEMPTS: '5',
       OMISE_RETRY_DELAY: '2000',
@@ -71,19 +67,12 @@ describe('Configuration Management', () => {
       SERVER_NAME: 'test-server',
       SERVER_VERSION: '2.0.0',
       SERVER_DESCRIPTION: 'Test MCP Server',
-      PORT: '8080',
-      HOST: '0.0.0.0',
       
       // Optional logging variables
       LOG_LEVEL: 'debug',
       LOG_FORMAT: 'json',
       LOG_REQUESTS: 'true',
       LOG_RESPONSES: 'false',
-      
-      // Optional rate limit variables
-      RATE_LIMIT_ENABLED: 'true',
-      RATE_LIMIT_MAX_REQUESTS: '200',
-      RATE_LIMIT_WINDOW_MS: '120000'
     };
   }
 
@@ -101,7 +90,6 @@ describe('Configuration Management', () => {
 
       // Assert
       expect(config).toBeDefined();
-      expect(config.omise.publicKey).toBe('pkey_test_1234567890');
       expect(config.omise.secretKey).toBe('skey_test_1234567890');
       expect(config.omise.environment).toBe('test');
       expect(config.tools.allowed).toBe('all');
@@ -118,12 +106,10 @@ describe('Configuration Management', () => {
       expect(config).toBeDefined();
       
       // Omise configuration
-      expect(config.omise.publicKey).toBe('pkey_test_1234567890');
       expect(config.omise.secretKey).toBe('skey_test_1234567890');
       expect(config.omise.environment).toBe('test');
       expect(config.omise.apiVersion).toBe('2019-05-29');
       expect(config.omise.baseUrl).toBe('https://api.omise.co');
-      expect(config.omise.vaultUrl).toBe('https://vault.omise.co');
       expect(config.omise.timeout).toBe(45000);
       expect(config.omise.retryAttempts).toBe(5);
       expect(config.omise.retryDelay).toBe(2000);
@@ -132,19 +118,12 @@ describe('Configuration Management', () => {
       expect(config.server.name).toBe('test-server');
       expect(config.server.version).toBe('2.0.0');
       expect(config.server.description).toBe('Test MCP Server');
-      expect(config.server.port).toBe(8080);
-      expect(config.server.host).toBe('0.0.0.0');
       
       // Logging configuration
       expect(config.logging.level).toBe('debug');
       expect(config.logging.format).toBe('json');
       expect(config.logging.enableRequestLogging).toBe(true);
       expect(config.logging.enableResponseLogging).toBe(false);
-      
-      // Rate limit configuration
-      expect(config.rateLimit.enabled).toBe(true);
-      expect(config.rateLimit.maxRequests).toBe(200);
-      expect(config.rateLimit.windowMs).toBe(120000);
       
       // Tools configuration
       expect(config.tools.allowed).toBe('all');
@@ -158,9 +137,8 @@ describe('Configuration Management', () => {
       const config = loadConfig();
 
       // Assert
-      expect(config.omise.apiVersion).toBe('2017-11-02');
+      expect(config.omise.apiVersion).toBe('2019-05-29');
       expect(config.omise.baseUrl).toBe('https://api.omise.co');
-      expect(config.omise.vaultUrl).toBe('https://vault.omise.co');
       expect(config.omise.timeout).toBe(30000);
       expect(config.omise.retryAttempts).toBe(3);
       expect(config.omise.retryDelay).toBe(1000);
@@ -168,17 +146,11 @@ describe('Configuration Management', () => {
       expect(config.server.name).toBe('omise-mcp-server');
       expect(config.server.version).toBe('1.0.0');
       expect(config.server.description).toBe('MCP Server for Omise Payment Integration');
-      expect(config.server.port).toBe(3000);
-      expect(config.server.host).toBe('localhost');
       
       expect(config.logging.level).toBe('info');
       expect(config.logging.format).toBe('simple');
       expect(config.logging.enableRequestLogging).toBe(false);
       expect(config.logging.enableResponseLogging).toBe(false);
-      
-      expect(config.rateLimit.enabled).toBe(false);
-      expect(config.rateLimit.maxRequests).toBe(100);
-      expect(config.rateLimit.windowMs).toBe(60000);
     });
 
     it('should parse numeric environment variables correctly', () => {
@@ -188,9 +160,6 @@ describe('Configuration Management', () => {
         OMISE_TIMEOUT: '60000',
         OMISE_RETRY_ATTEMPTS: '10',
         OMISE_RETRY_DELAY: '5000',
-        PORT: '9000',
-        RATE_LIMIT_MAX_REQUESTS: '500',
-        RATE_LIMIT_WINDOW_MS: '300000'
       });
 
       // Act
@@ -200,9 +169,6 @@ describe('Configuration Management', () => {
       expect(config.omise.timeout).toBe(60000);
       expect(config.omise.retryAttempts).toBe(10);
       expect(config.omise.retryDelay).toBe(5000);
-      expect(config.server.port).toBe(9000);
-      expect(config.rateLimit.maxRequests).toBe(500);
-      expect(config.rateLimit.windowMs).toBe(300000);
     });
 
     it('should parse boolean environment variables correctly', () => {
@@ -211,7 +177,6 @@ describe('Configuration Management', () => {
         ...createValidTestEnv(),
         LOG_REQUESTS: 'true',
         LOG_RESPONSES: 'false',
-        RATE_LIMIT_ENABLED: 'true'
       });
 
       // Act
@@ -220,7 +185,6 @@ describe('Configuration Management', () => {
       // Assert
       expect(config.logging.enableRequestLogging).toBe(true);
       expect(config.logging.enableResponseLogging).toBe(false);
-      expect(config.rateLimit.enabled).toBe(true);
     });
 
     it('should handle empty string boolean values as false', () => {
@@ -229,7 +193,6 @@ describe('Configuration Management', () => {
         ...createValidTestEnv(),
         LOG_REQUESTS: '',
         LOG_RESPONSES: '',
-        RATE_LIMIT_ENABLED: ''
       });
 
       // Act
@@ -238,13 +201,12 @@ describe('Configuration Management', () => {
       // Assert
       expect(config.logging.enableRequestLogging).toBe(false);
       expect(config.logging.enableResponseLogging).toBe(false);
-      expect(config.rateLimit.enabled).toBe(false);
     });
 
     it('should handle undefined boolean values as false', () => {
       // Arrange
       Object.assign(process.env, createValidTestEnv());
-      // Don't set LOG_REQUESTS, LOG_RESPONSES, RATE_LIMIT_ENABLED
+      // Don't set LOG_REQUESTS, LOG_RESPONSES
 
       // Act
       const config = loadConfig();
@@ -252,7 +214,6 @@ describe('Configuration Management', () => {
       // Assert
       expect(config.logging.enableRequestLogging).toBe(false);
       expect(config.logging.enableResponseLogging).toBe(false);
-      expect(config.rateLimit.enabled).toBe(false);
     });
   });
 
@@ -261,22 +222,10 @@ describe('Configuration Management', () => {
   // ============================================================================
 
   describe('loadConfig - Required Environment Variables', () => {
-    it('should throw error when OMISE_PUBLIC_KEY is missing', () => {
-      // Arrange
-      Object.assign(process.env, {
-        OMISE_SECRET_KEY: 'skey_test_1234567890',
-        OMISE_ENVIRONMENT: 'test',
-        TOOLS: 'all'
-      });
-
-      // Act & Assert
-      expect(() => loadConfig()).toThrow('Missing required environment variable: OMISE_PUBLIC_KEY');
-    });
 
     it('should throw error when OMISE_SECRET_KEY is missing', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_ENVIRONMENT: 'test',
         TOOLS: 'all'
       });
@@ -288,7 +237,6 @@ describe('Configuration Management', () => {
     it('should throw error when OMISE_ENVIRONMENT is missing', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         TOOLS: 'all'
       });
@@ -300,7 +248,6 @@ describe('Configuration Management', () => {
     it('should throw error when TOOLS is missing', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: 'test'
       });
@@ -312,7 +259,6 @@ describe('Configuration Management', () => {
     it('should throw error when TOOLS is empty string', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: 'test',
         TOOLS: ''
@@ -325,7 +271,6 @@ describe('Configuration Management', () => {
     it('should throw error when TOOLS is whitespace only', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: 'test',
         TOOLS: '   '
@@ -342,7 +287,6 @@ describe('Configuration Management', () => {
     it('should accept TOOLS with specific tool names', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: 'test',
         TOOLS: 'create_charge,list_charges,create_customer'
@@ -358,7 +302,6 @@ describe('Configuration Management', () => {
     it('should accept TOOLS with "all" value', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: 'test',
         TOOLS: 'all'
@@ -380,7 +323,6 @@ describe('Configuration Management', () => {
     it('should accept "test" environment', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: 'test',
         TOOLS: 'all'
@@ -412,7 +354,6 @@ describe('Configuration Management', () => {
     it('should throw error for invalid environment', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: 'staging',
         TOOLS: 'all'
@@ -425,7 +366,6 @@ describe('Configuration Management', () => {
     it('should throw error for empty environment', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_test_1234567890',
         OMISE_SECRET_KEY: 'skey_test_1234567890',
         OMISE_ENVIRONMENT: '',
         TOOLS: 'all'
@@ -445,12 +385,10 @@ describe('Configuration Management', () => {
       // Arrange
       const config: ServerConfig = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'test',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -468,11 +406,6 @@ describe('Configuration Management', () => {
           enableRequestLogging: false,
           enableResponseLogging: false
         },
-        rateLimit: {
-          enabled: false,
-          maxRequests: 100,
-          windowMs: 60000
-        },
         tools: {
           allowed: 'all'
         }
@@ -486,12 +419,10 @@ describe('Configuration Management', () => {
       // Arrange
       const config: ServerConfig = {
         omise: {
-          publicKey: 'pkey_live_1234567890',
           secretKey: 'skey_live_1234567890',
           environment: 'production',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -508,11 +439,6 @@ describe('Configuration Management', () => {
           format: 'simple',
           enableRequestLogging: false,
           enableResponseLogging: false
-        },
-        rateLimit: {
-          enabled: false,
-          maxRequests: 100,
-          windowMs: 60000
         },
         tools: {
           allowed: 'all'
@@ -533,7 +459,6 @@ describe('Configuration Management', () => {
           environment: 'production',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -551,11 +476,6 @@ describe('Configuration Management', () => {
           enableRequestLogging: false,
           enableResponseLogging: false
         },
-        rateLimit: {
-          enabled: false,
-          maxRequests: 100,
-          windowMs: 60000
-        },
         tools: {
           allowed: 'all'
         }
@@ -569,12 +489,10 @@ describe('Configuration Management', () => {
       // Arrange - test all combinations of production keys in test environment
       const config1: ServerConfig = {
         omise: {
-          publicKey: 'pkey_live_1234567890',
           secretKey: 'skey_live_1234567890',
           environment: 'test',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -592,38 +510,13 @@ describe('Configuration Management', () => {
           enableRequestLogging: false,
           enableResponseLogging: false
         },
-        rateLimit: {
-          enabled: false,
-          maxRequests: 100,
-          windowMs: 60000
-        },
         tools: {
           allowed: 'all'
         }
       };
 
-      const config2: ServerConfig = {
-        ...config1,
-        omise: {
-          ...config1.omise,
-          publicKey: 'pkey_live_1234567890',
-          secretKey: 'skey_test_1234567890' // Production public, test secret
-        }
-      };
-
-      const config3: ServerConfig = {
-        ...config1,
-        omise: {
-          ...config1.omise,
-          publicKey: 'pkey_test_1234567890',
-          secretKey: 'skey_live_1234567890' // Test public, production secret
-        }
-      };
-
       // Act & Assert
       expect(() => validateOmiseKeys(config1)).toThrow('Live keys should not be used in test environment');
-      expect(() => validateOmiseKeys(config2)).toThrow('Live keys should not be used in test environment');
-      expect(() => validateOmiseKeys(config3)).toThrow('Live keys should not be used in test environment');
     });
   });
 
@@ -636,12 +529,10 @@ describe('Configuration Management', () => {
       // Arrange
       const config: ServerConfig = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'test',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -649,20 +540,13 @@ describe('Configuration Management', () => {
         server: {
           name: 'test-server',
           version: '1.0.0',
-          description: 'Test MCP Server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Test MCP Server'
         },
         logging: {
           level: 'info',
           format: 'simple',
           enableRequestLogging: false,
           enableResponseLogging: false
-        },
-        rateLimit: {
-          enabled: false,
-          maxRequests: 100,
-          windowMs: 60000
         },
         tools: {
           allowed: 'all'
@@ -690,12 +574,10 @@ describe('Configuration Management', () => {
       // Arrange
       const config: ServerConfig = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'test',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -703,20 +585,13 @@ describe('Configuration Management', () => {
         server: {
           name: 'test-server',
           version: '1.0.0',
-          description: 'Test MCP Server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Test MCP Server'
         },
         logging: {
           level: 'info',
           format: 'simple',
           enableRequestLogging: false,
           enableResponseLogging: false
-        },
-        rateLimit: {
-          enabled: false,
-          maxRequests: 100,
-          windowMs: 60000
         },
         tools: {
           allowed: 'all'
@@ -730,7 +605,6 @@ describe('Configuration Management', () => {
       const expectedTools = [
         'create_charge', 'get_charge',
         'create_customer', 'get_customer',
-        'create_token', 'get_token',
         'create_transfer', 'get_transfer',
         'create_recipient', 'get_recipient',
         'create_refund', 'get_refund',
@@ -747,12 +621,10 @@ describe('Configuration Management', () => {
       // Arrange
       const config: ServerConfig = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'test',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -760,20 +632,13 @@ describe('Configuration Management', () => {
         server: {
           name: 'test-server',
           version: '1.0.0',
-          description: 'Test MCP Server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Test MCP Server'
         },
         logging: {
           level: 'info',
           format: 'simple',
           enableRequestLogging: false,
           enableResponseLogging: false
-        },
-        rateLimit: {
-          enabled: false,
-          maxRequests: 100,
-          windowMs: 60000
         },
         tools: {
           allowed: 'all'
@@ -785,7 +650,7 @@ describe('Configuration Management', () => {
 
       // Assert
       const expectedResources = [
-        'charge', 'customer', 'card', 'token',
+        'charge', 'customer', 'card',
         'transfer', 'recipient', 'transaction',
         'refund', 'dispute', 'event', 'schedule',
         'source', 'capability'
@@ -799,12 +664,10 @@ describe('Configuration Management', () => {
       // Arrange
       const config: ServerConfig = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'test',
           apiVersion: '2017-11-02',
           baseUrl: 'https://api.omise.co',
-          vaultUrl: 'https://vault.omise.co',
           timeout: 30000,
           retryAttempts: 3,
           retryDelay: 1000
@@ -812,20 +675,13 @@ describe('Configuration Management', () => {
         server: {
           name: 'custom-server',
           version: '2.1.0',
-          description: 'Custom MCP Server for Omise',
-          port: 8080,
-          host: '0.0.0.0'
+          description: 'Custom MCP Server for Omise'
         },
         logging: {
           level: 'debug',
           format: 'json',
           enableRequestLogging: true,
           enableResponseLogging: true
-        },
-        rateLimit: {
-          enabled: true,
-          maxRequests: 200,
-          windowMs: 120000
         },
         tools: {
           allowed: 'create_charge,list_charges'
@@ -851,9 +707,7 @@ describe('Configuration Management', () => {
       // Arrange
       Object.assign(process.env, {
         ...createValidTestEnv(),
-        OMISE_TIMEOUT: 'invalid',
-        PORT: 'not-a-number',
-        RATE_LIMIT_MAX_REQUESTS: 'abc'
+        OMISE_TIMEOUT: 'invalid'
       });
 
       // Act
@@ -861,17 +715,13 @@ describe('Configuration Management', () => {
 
       // Assert
       expect(config.omise.timeout).toBeNaN();
-      expect(config.server.port).toBeNaN();
-      expect(config.rateLimit.maxRequests).toBeNaN();
     });
 
     it('should handle zero values for numeric environment variables', () => {
       // Arrange
       Object.assign(process.env, {
         ...createValidTestEnv(),
-        OMISE_TIMEOUT: '0',
-        PORT: '0',
-        RATE_LIMIT_MAX_REQUESTS: '0'
+        OMISE_TIMEOUT: '0'
       });
 
       // Act
@@ -879,17 +729,13 @@ describe('Configuration Management', () => {
 
       // Assert
       expect(config.omise.timeout).toBe(0);
-      expect(config.server.port).toBe(0);
-      expect(config.rateLimit.maxRequests).toBe(0);
     });
 
     it('should handle negative values for numeric environment variables', () => {
       // Arrange
       Object.assign(process.env, {
         ...createValidTestEnv(),
-        OMISE_TIMEOUT: '-1000',
-        PORT: '-1',
-        RATE_LIMIT_MAX_REQUESTS: '-50'
+        OMISE_TIMEOUT: '-1000'
       });
 
       // Act
@@ -897,17 +743,13 @@ describe('Configuration Management', () => {
 
       // Assert
       expect(config.omise.timeout).toBe(-1000);
-      expect(config.server.port).toBe(-1);
-      expect(config.rateLimit.maxRequests).toBe(-50);
     });
 
     it('should handle very large numeric values', () => {
       // Arrange
       Object.assign(process.env, {
         ...createValidTestEnv(),
-        OMISE_TIMEOUT: '999999999',
-        PORT: '65535',
-        RATE_LIMIT_MAX_REQUESTS: '1000000'
+        OMISE_TIMEOUT: '999999999'
       });
 
       // Act
@@ -915,8 +757,6 @@ describe('Configuration Management', () => {
 
       // Assert
       expect(config.omise.timeout).toBe(999999999);
-      expect(config.server.port).toBe(65535);
-      expect(config.rateLimit.maxRequests).toBe(1000000);
     });
 
     it('should handle empty string values for optional environment variables', () => {
@@ -925,8 +765,7 @@ describe('Configuration Management', () => {
         ...createValidTestEnv(),
         SERVER_NAME: '',
         SERVER_VERSION: '',
-        SERVER_DESCRIPTION: '',
-        HOST: ''
+        SERVER_DESCRIPTION: ''
       });
 
       // Act
@@ -937,7 +776,6 @@ describe('Configuration Management', () => {
       expect(config.server.name).toBe('omise-mcp-server');
       expect(config.server.version).toBe('1.0.0');
       expect(config.server.description).toBe('MCP Server for Omise Payment Integration');
-      expect(config.server.host).toBe('localhost');
     });
 
     it('should handle special characters in environment variables', () => {
@@ -945,8 +783,7 @@ describe('Configuration Management', () => {
       Object.assign(process.env, {
         ...createValidTestEnv(),
         SERVER_NAME: 'test-server-123',
-        SERVER_DESCRIPTION: 'Test Server with Special Characters: @#$%^&*()',
-        HOST: 'localhost.local'
+        SERVER_DESCRIPTION: 'Test Server with Special Characters: @#$%^&*()'
       });
 
       // Act
@@ -955,7 +792,6 @@ describe('Configuration Management', () => {
       // Assert
       expect(config.server.name).toBe('test-server-123');
       expect(config.server.description).toBe('Test Server with Special Characters: @#$%^&*()');
-      expect(config.server.host).toBe('localhost.local');
     });
 
     it('should handle very long environment variable values', () => {
@@ -1024,9 +860,7 @@ describe('Configuration Management', () => {
       // Assert
       expect(config).toBeDefined();
       expect(config.omise.timeout).toBe(45000);
-      expect(config.server.port).toBe(8080);
       expect(config.logging.level).toBe('debug');
-      expect(config.rateLimit.enabled).toBe(true);
       expect(serverInfo).toBeDefined();
     });
   });

@@ -24,10 +24,6 @@ export const VALID_TOOLS = [
   'update_customer_card',
   'destroy_customer_card',
   
-  // Token Tools (2 tools)
-  'create_token',
-  'retrieve_token',
-  
   // Source Tools (2 tools)
   'create_source',
   'retrieve_source',

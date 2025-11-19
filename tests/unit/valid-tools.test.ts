@@ -51,16 +51,6 @@ describe('Valid Tools', () => {
       });
     });
 
-    it('should contain all expected token tools', () => {
-      const expectedTokenTools = [
-        'create_token',
-        'retrieve_token'
-      ];
-
-      expectedTokenTools.forEach(tool => {
-        expect(VALID_TOOLS).toContain(tool);
-      });
-    });
 
     it('should contain all expected source tools', () => {
       const expectedSourceTools = [
@@ -167,9 +157,9 @@ describe('Valid Tools', () => {
     });
 
     it('should have the correct total number of tools', () => {
-      // Payment: 7, Customer: 9, Token: 2, Source: 2, Transfer: 5, 
+      // Payment: 7, Customer: 9, Source: 2, Transfer: 5, 
       // Recipient: 6, Refund: 3, Dispute: 8, Schedule: 5, Event: 2, Capability: 1
-      const expectedTotal = 7 + 9 + 2 + 2 + 5 + 6 + 3 + 8 + 5 + 2 + 1;
+      const expectedTotal = 7 + 9 + 2 + 5 + 6 + 3 + 8 + 5 + 2 + 1;
       expect(VALID_TOOLS).toHaveLength(expectedTotal);
     });
 
@@ -182,7 +172,7 @@ describe('Valid Tools', () => {
       // TypeScript readonly arrays can still be mutated at runtime
       // This test verifies the array structure is correct
       expect(Array.isArray(VALID_TOOLS)).toBe(true);
-      expect(VALID_TOOLS).toHaveLength(50);
+      expect(VALID_TOOLS).toHaveLength(48);
     });
   });
 
@@ -436,8 +426,7 @@ describe('Valid Tools', () => {
         'invalid_tool',
         'create_customer',
         'retrieve_customer',
-        'another_invalid',
-        'create_token'
+        'another_invalid'
       ];
       
       const result = validateToolNames(externalTools);
@@ -447,8 +436,7 @@ describe('Valid Tools', () => {
         'create_charge',
         'retrieve_charge',
         'create_customer',
-        'retrieve_customer',
-        'create_token'
+        'retrieve_customer'
       ]);
       expect(result.invalidTools).toEqual(['invalid_tool', 'another_invalid']);
     });

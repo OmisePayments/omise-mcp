@@ -1,6 +1,6 @@
 # Omise MCP Server Test Suite
 
-Comprehensive test suite for the Omise MCP server with A2A authentication and communication capabilities.
+Comprehensive test suite for the Omise MCP server.
 
 ## Test Structure
 
@@ -9,16 +9,12 @@ tests/
 ├── auth/                    # Authentication tests
 │   └── authentication.test.ts
 ├── fixtures/                # Test fixtures and mock data
-│   └── auth-fixtures.ts
 ├── integration/             # Integration tests
-│   └── a2a-integration.test.ts
+│   ├── api-integration.test.ts
+│   └── tool-access-control.test.ts
 ├── mocks/                   # Test mocks and utilities
 │   └── auth-mocks.ts
 ├── unit/                    # Unit tests
-│   ├── oauth2-provider.test.ts
-│   ├── mutual-tls.test.ts
-│   ├── a2a-communication.test.ts
-│   └── a2a-auth-service.test.ts
 ├── setup.ts                 # Test setup and configuration
 └── README.md               # This file
 ```
@@ -27,47 +23,14 @@ tests/
 
 ### 1. Unit Tests
 
-#### OAuth2Provider Tests (`tests/unit/oauth2-provider.test.ts`)
-- **Client Registration**: Test OAuth client registration with various configurations
-- **Authorization URL Generation**: Test authorization URL generation with PKCE
-- **Token Exchange**: Test authorization code to access token exchange
-- **Token Refresh**: Test access token refresh functionality
-- **Token Validation**: Test access token validation and parsing
-- **Token Revocation**: Test token revocation and cleanup
-- **Cleanup Tasks**: Test expired token and code cleanup
-
-#### MutualTLSProvider Tests (`tests/unit/mutual-tls.test.ts`)
-- **Certificate Issuance**: Test agent certificate issuance
-- **Certificate Validation**: Test certificate validation against trusted CA
-- **TLS Context Creation**: Test TLS context creation for secure connections
-- **Certificate Revocation**: Test certificate revocation
-- **Certificate Status**: Test certificate status checking
-- **Certificate Listing**: Test certificate listing and management
-
-#### A2ACommunication Tests (`tests/unit/a2a-communication.test.ts`)
-- **Connection Initialization**: Test secure channel establishment
-- **Message Sending**: Test encrypted and unencrypted message sending
-- **Message Receiving**: Test message processing and validation
-- **Message Type Handlers**: Test different message type handlers
-- **Connection Management**: Test connection closing and status
-- **Security Features**: Test encryption, signing, and replay protection
-
-#### A2AAuthService Tests (`tests/unit/a2a-auth-service.test.ts`)
-- **Agent Registration**: Test complete agent registration flow
-- **Agent Authentication**: Test authentication with various security levels
-- **Secure Channel Establishment**: Test secure channel setup
-- **Secure Message Sending**: Test secure message transmission
-- **Health Checks**: Test health check functionality
-- **Security Metrics**: Test security metrics collection
+Unit tests for individual components and utilities.
 
 ### 2. Integration Tests
 
-#### A2A Integration Tests (`tests/integration/a2a-integration.test.ts`)
-- **End-to-End Flow**: Complete workflow from registration to payment
-- **Multi-Agent Communication**: Communication between multiple agents
-- **Security Scenarios**: Rate limiting, authentication failures, certificate validation
+#### API Integration Tests (`tests/integration/api-integration.test.ts`)
+- **End-to-End Flow**: Complete workflow for API operations
+- **Tool Access Control**: Test tool access control and authorization
 - **Performance Tests**: Concurrent operations and scalability
-- **Audit and Monitoring**: Comprehensive audit logging and metrics
 
 ### 3. Authentication Tests
 
@@ -77,17 +40,9 @@ tests/
 - **Permission-Based Authorization**: Test scope-based access control
 - **Multi-Tenant Authorization**: Test multi-tenant access control
 - **Session-Based Authentication**: Test session management
-- **OAuth Token Authentication**: Test OAuth token validation
 - **IP-Based Access Control**: Test IP whitelisting/blacklisting
-- **Rate Limit Authentication**: Test rate limiting and throttling
 
 ## Test Fixtures and Mocks
-
-### Test Fixtures (`tests/fixtures/auth-fixtures.ts`)
-- **Mock Configurations**: OAuth, mTLS, and communication configurations
-- **Mock Data**: Agent identities, messages, and payloads
-- **Test Data Generators**: Functions to generate test data
-- **Error Responses**: Mock error responses for testing
 
 ### Test Mocks (`tests/mocks/auth-mocks.ts`)
 - **Service Mocks**: Mock implementations of all services
@@ -157,7 +112,6 @@ OMISE_SECRET_KEY=test-secret-key
 OMISE_API_URL=https://api.omise.co
 LOG_LEVEL=error
 AUDIT_LOGGING=true
-RATE_LIMIT_PER_MINUTE=1000
 ENCRYPTION_KEY=test-encryption-key-32-characters-long
 SIGNING_KEY=test-signing-key-32-characters-long
 JWT_SECRET=test-jwt-secret-key
@@ -220,15 +174,11 @@ The test suite includes comprehensive test data generation:
 - **Payment Data**: Various payment scenarios and amounts
 - **Customer Data**: Customer information and operations
 - **Certificate Data**: Mock certificates and keys
-- **Token Data**: OAuth tokens and JWT tokens
-- **Message Data**: A2A communication messages
 
 ## Test Scenarios
 
 ### Basic Scenarios
 1. **Agent Registration**: Test agent registration with various configurations
-2. **Authentication Flow**: Test complete OAuth 2.0 authentication flow
-3. **Secure Communication**: Test encrypted A2A message exchange
 4. **Payment Processing**: Test Omise payment operations
 5. **Customer Operations**: Test customer management operations
 
@@ -241,12 +191,10 @@ The test suite includes comprehensive test data generation:
 6. **Load Testing**: Test under concurrent load conditions
 
 ### Security Scenarios
-1. **Rate Limiting**: Test rate limiting and throttling
 2. **Authentication Failures**: Test invalid credentials and tokens
 3. **Certificate Validation**: Test certificate validation failures
 4. **Encryption Failures**: Test encryption/decryption errors
 5. **Replay Attacks**: Test replay attack prevention
-6. **Man-in-the-Middle**: Test mTLS protection
 
 ## Performance Testing
 
