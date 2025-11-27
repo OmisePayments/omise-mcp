@@ -111,12 +111,6 @@ OMISE_SECRET_KEY=test-secret-key
 OMISE_API_URL=https://api.omise.co
 LOG_LEVEL=error
 AUDIT_LOGGING=true
-ENCRYPTION_KEY=test-encryption-key-32-characters-long
-SIGNING_KEY=test-signing-key-32-characters-long
-JWT_SECRET=test-jwt-secret-key
-CERT_PATH=./test-certs
-CERTIFICATE_VALIDITY_DAYS=365
-KEY_SIZE=2048
 ```
 
 ### Jest Configuration

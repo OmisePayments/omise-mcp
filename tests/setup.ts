@@ -15,12 +15,6 @@ process.env.OMISE_SECRET_KEY = 'test-secret-key';
 process.env.OMISE_API_URL = 'https://api.omise.co';
 process.env.LOG_LEVEL = 'error';
 process.env.AUDIT_LOGGING = 'true';
-process.env.ENCRYPTION_KEY = 'test-encryption-key-32-characters-long';
-process.env.SIGNING_KEY = 'test-signing-key-32-characters-long';
-process.env.JWT_SECRET = 'test-jwt-secret-key';
-process.env.CERT_PATH = './test-certs';
-process.env.CERTIFICATE_VALIDITY_DAYS = '365';
-process.env.KEY_SIZE = '2048';
 
 // Global test hooks
 beforeAll(() => {

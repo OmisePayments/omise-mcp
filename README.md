@@ -60,7 +60,7 @@
 - **Framework**: Model Context Protocol (MCP)
 - **HTTP Client**: Axios
 - **Logging**: Winston
-- **Testing**: Jest + MSW
+- **Testing**: Jest
 - **Containerization**: Docker + Docker Compose
 
 ## 🚀 Quick Start
