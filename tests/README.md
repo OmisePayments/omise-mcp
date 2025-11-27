@@ -8,13 +8,14 @@ Comprehensive test suite for the Omise MCP server.
 tests/
 ├── auth/                    # Authentication tests
 │   └── authentication.test.ts
-├── fixtures/                # Test fixtures and mock data
 ├── integration/             # Integration tests
 │   ├── api-integration.test.ts
 │   └── tool-access-control.test.ts
-├── mocks/                   # Test mocks and utilities
-│   └── auth-mocks.ts
+├── error/                   # Error handling tests
+│   └── error-handling.test.ts
 ├── unit/                    # Unit tests
+├── factories/               # Test data factories
+│   └── index.ts
 ├── setup.ts                 # Test setup and configuration
 └── README.md               # This file
 ```
@@ -30,26 +31,28 @@ Unit tests for individual components and utilities.
 #### API Integration Tests (`tests/integration/api-integration.test.ts`)
 - **End-to-End Flow**: Complete workflow for API operations
 - **Tool Access Control**: Test tool access control and authorization
-- **Performance Tests**: Concurrent operations and scalability
 
 ### 3. Authentication Tests
 
 #### Authentication Tests (`tests/auth/authentication.test.ts`)
 - **API Key Validation**: Test API key validation and security
 - **Environment Key Validation**: Test environment variable validation
-- **Permission-Based Authorization**: Test scope-based access control
-- **Multi-Tenant Authorization**: Test multi-tenant access control
-- **Session-Based Authentication**: Test session management
-- **IP-Based Access Control**: Test IP whitelisting/blacklisting
+- **Tool Access Control**: Test tool access control and authorization
 
-## Test Fixtures and Mocks
+## Test Fixtures and Factories
 
-### Test Mocks (`tests/mocks/auth-mocks.ts`)
-- **Service Mocks**: Mock implementations of all services
-- **Response Mocks**: Mock successful and error responses
-- **Crypto Mocks**: Mock cryptographic functions
-- **File System Mocks**: Mock file system operations
-- **HTTP Mocks**: Mock HTTP requests and responses
+### Test Factories (`tests/factories/index.ts`)
+- **Charge Factory**: Generate mock charge data
+- **Customer Factory**: Generate mock customer data
+- **Transfer Factory**: Generate mock transfer data
+- **Recipient Factory**: Generate mock recipient data
+- **Refund Factory**: Generate mock refund data
+- **Dispute Factory**: Generate mock dispute data
+- **Schedule Factory**: Generate mock schedule data
+- **Event Factory**: Generate mock event data
+- **Capability Factory**: Generate mock capability data
+
+Tests use Jest mocks for axios and service classes.
 
 ## Running Tests
 
@@ -74,8 +77,8 @@ npm run test:integration
 # Authentication tests only
 npm run test:auth
 
-# All tests
-npm run test:all
+# Error handling tests only
+npm run test:error
 ```
 
 ### Run Tests with Coverage
@@ -88,17 +91,6 @@ npm run test:coverage
 npm run test:watch
 ```
 
-### Run Test App
-```bash
-# Start test app
-npm run test:app:dev
-
-# Run test runner
-npm run test:runner:all
-npm run test:runner:performance
-npm run test:runner:load
-npm run test:runner:report
-```
 
 ## Test Configuration
 
@@ -107,17 +99,10 @@ The test suite uses the following environment variables:
 
 ```bash
 NODE_ENV=test
-OMISE_PUBLIC_KEY=test-public-key
 OMISE_SECRET_KEY=test-secret-key
 OMISE_API_URL=https://api.omise.co
 LOG_LEVEL=error
 AUDIT_LOGGING=true
-ENCRYPTION_KEY=test-encryption-key-32-characters-long
-SIGNING_KEY=test-signing-key-32-characters-long
-JWT_SECRET=test-jwt-secret-key
-CERT_PATH=./test-certs
-CERTIFICATE_VALIDITY_DAYS=365
-KEY_SIZE=2048
 ```
 
 ### Jest Configuration
@@ -148,69 +133,60 @@ The Jest configuration is defined in `package.json`:
 
 ## Test Utilities
 
-### Global Test Utilities
-The test setup provides global utilities accessible in all tests:
+### Test Data Factories
+The test suite uses factory functions to generate mock data:
 
 ```typescript
-// Generate test data
-const agent = global.testUtils.generateTestAgent();
-const payment = global.testUtils.generateTestPayment();
-const customer = global.testUtils.generateTestCustomer();
+import { 
+  createMockCharge, 
+  createMockCustomer, 
+  createMockTransfer,
+  createMockRecipient,
+  createMockRefund,
+  createMockDispute,
+  createMockSchedule,
+  createMockEvent,
+  createMockCapability
+} from '../factories';
 
-// Utility functions
-await global.testUtils.wait(1000); // Wait 1 second
-const randomString = global.testUtils.randomString(10);
-
-// Mock utilities
-const mockLogger = global.testUtils.createMockLogger();
-const mockResponse = global.testUtils.createMockAxiosResponse(data);
-const mockError = global.testUtils.createMockAxiosError('Error message');
+// Generate test data with optional overrides
+const charge = createMockCharge({ amount: 1000, currency: 'THB' });
+const customer = createMockCustomer({ email: 'test@example.com' });
 ```
 
-### Test Data Generation
-The test suite includes comprehensive test data generation:
+### Jest Mocks
+Tests use Jest module mocking for external dependencies:
 
-- **Agent Data**: Realistic agent registration information
-- **Payment Data**: Various payment scenarios and amounts
-- **Customer Data**: Customer information and operations
-- **Certificate Data**: Mock certificates and keys
+```typescript
+// Mock axios
+jest.mock('axios');
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
+// Mock services
+jest.mock('../../src/utils/omise-client');
+jest.mock('../../src/utils/logger');
+```
 
 ## Test Scenarios
 
 ### Basic Scenarios
-1. **Agent Registration**: Test agent registration with various configurations
-4. **Payment Processing**: Test Omise payment operations
-5. **Customer Operations**: Test customer management operations
+1. **Payment Processing**: Test Omise charge operations (create, retrieve, list, update, capture, reverse, expire)
+2. **Customer Operations**: Test customer management operations (create, retrieve, list, update, delete)
+3. **Source Management**: Test payment source creation and retrieval
+4. **Transfer Operations**: Test transfer and recipient management
+5. **Refund Processing**: Test refund creation and retrieval
+6. **Dispute Handling**: Test dispute management operations
+7. **Schedule Management**: Test recurring payment schedules
+8. **Event Tracking**: Test event listing and retrieval
+9. **Capability Verification**: Test API capability checks
 
 ### Advanced Scenarios
-1. **End-to-End Flow**: Complete workflow from registration to payment
-2. **Multi-Agent Communication**: Communication between multiple agents
+1. **End-to-End Flow**: Complete workflow from customer creation to charge processing
+2. **Tool Access Control**: Test tool access restrictions and authorization
 3. **Error Handling**: Test error scenarios and edge cases
-4. **Security Validation**: Test security policies and validations
-5. **Performance Testing**: Benchmark system performance
-6. **Load Testing**: Test under concurrent load conditions
+4. **API Integration**: Test integration between components
+5. **Configuration Validation**: Test environment variable validation
 
-### Security Scenarios
-2. **Authentication Failures**: Test invalid credentials and tokens
-3. **Certificate Validation**: Test certificate validation failures
-4. **Encryption Failures**: Test encryption/decryption errors
-5. **Replay Attacks**: Test replay attack prevention
-
-## Performance Testing
-
-### Benchmark Tests
-- **Registration Performance**: Test agent registration speed
-- **Authentication Performance**: Test authentication response times
-- **Message Sending Performance**: Test message transmission speed
-- **Payment Processing Performance**: Test payment processing speed
-- **Concurrent Operations**: Test concurrent operation handling
-
-### Load Tests
-- **Concurrent Users**: Test with multiple concurrent users
-- **Message Throughput**: Test message processing throughput
-- **Connection Limits**: Test connection limit handling
-- **Memory Usage**: Test memory usage under load
-- **CPU Usage**: Test CPU usage under load
 
 ## Coverage Reports
 
@@ -228,31 +204,10 @@ Coverage reports are generated in multiple formats:
 
 ## Continuous Integration
 
-### GitHub Actions
-The test suite is designed to run in CI/CD environments:
-
-```yaml
-name: Tests
-on: [push, pull_request]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-      - run: npm install
-      - run: npm run test:coverage
-      - uses: codecov/codecov-action@v1
-```
-
-### Test Reports
-Test results are automatically generated and can be integrated with:
-- **Codecov**: Code coverage reporting
-- **SonarQube**: Code quality analysis
-- **GitHub**: Pull request status checks
-- **Slack**: Test result notifications
+The test suite is designed to run in CI/CD environments. Configure your CI pipeline to:
+- Run `npm install` to install dependencies
+- Run `npm test` or `npm run test:coverage` for coverage reports
+- Use Jest's built-in coverage reporting (text, lcov, html formats)
 
 ## Troubleshooting
 
@@ -283,7 +238,7 @@ npm test -- --verbose
 ### Adding New Tests
 1. Create test file in appropriate directory
 2. Follow naming convention: `*.test.ts`
-3. Use existing fixtures and mocks
+3. Use existing factories and Jest mocks
 4. Add proper test descriptions
 5. Ensure tests are isolated and repeatable
 

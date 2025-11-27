@@ -56,7 +56,6 @@ RUN mkdir -p /app/logs && chown -R omise:nodejs /app/logs
 USER omise
 
 # Note: This is an MCP stdio server, not an HTTP server
-# No port exposure or healthcheck needed as it communicates via stdio
 
 # Environment variables
 ENV NODE_ENV=production

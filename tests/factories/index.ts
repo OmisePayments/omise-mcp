@@ -94,24 +94,6 @@ export function createMockCard(overrides: any = {}) {
 }
 
 // ============================================================================
-// Token Factory
-// ============================================================================
-export function createMockToken(overrides: any = {}) {
-  return {
-    object: 'token',
-    id: overrides.id || `tokn_${faker.string.alphanumeric(19).toLowerCase()}`,
-    livemode: false,
-    location: `/tokens/${overrides.id || faker.string.alphanumeric(19).toLowerCase()}`,
-    created: faker.date.past().toISOString(),
-    created_at: faker.date.past().toISOString(),
-    updated_at: faker.date.recent().toISOString(),
-    used: overrides.used ?? false,
-    card: overrides.card || createMockCard(),
-    ...overrides
-  };
-}
-
-// ============================================================================
 // Transfer Factory
 // ============================================================================
 export function createMockTransfer(overrides: any = {}) {

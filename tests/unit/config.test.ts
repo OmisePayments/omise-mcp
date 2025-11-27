@@ -338,7 +338,6 @@ describe('Configuration Management', () => {
     it('should accept "production" environment', () => {
       // Arrange
       Object.assign(process.env, {
-        OMISE_PUBLIC_KEY: 'pkey_live_1234567890',
         OMISE_SECRET_KEY: 'skey_live_1234567890',
         OMISE_ENVIRONMENT: 'production',
         TOOLS: 'all'
@@ -396,9 +395,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'test-server',
           version: '1.0.0',
-          description: 'Test server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Test server'
         },
         logging: {
           level: 'info',
@@ -430,9 +427,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'prod-server',
           version: '1.0.0',
-          description: 'Production server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Production server'
         },
         logging: {
           level: 'info',
@@ -454,7 +449,6 @@ describe('Configuration Management', () => {
       // Arrange
       const testKeysConfig: ServerConfig = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'production',
           apiVersion: '2017-11-02',
@@ -466,9 +460,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'prod-server',
           version: '1.0.0',
-          description: 'Production server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Production server'
         },
         logging: {
           level: 'info',
@@ -500,9 +492,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'test-server',
           version: '1.0.0',
-          description: 'Test server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Test server'
         },
         logging: {
           level: 'info',

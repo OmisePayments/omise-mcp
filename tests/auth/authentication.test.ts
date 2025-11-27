@@ -101,7 +101,6 @@ describe('Authentication Tests', () => {
       
       const config = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'production'
         }
@@ -119,7 +118,6 @@ describe('Authentication Tests', () => {
       
       const config = {
         omise: {
-          publicKey: 'pkey_1234567890',  // Live keys are pkey_ not pkey_test_
           secretKey: 'skey_1234567890',  // Live keys are skey_ not skey_test_
           environment: 'production'
         }
@@ -137,7 +135,6 @@ describe('Authentication Tests', () => {
       
       const config = {
         omise: {
-          publicKey: 'pkey_1234567890',  // Production keys are just pkey_ not pkey_test_
           secretKey: 'skey_1234567890',  // Production keys are just skey_ not skey_test_
           environment: 'test'
         }
@@ -155,7 +152,6 @@ describe('Authentication Tests', () => {
       
       const config = {
         omise: {
-          publicKey: 'pkey_test_1234567890',
           secretKey: 'skey_test_1234567890',
           environment: 'test'
         }
@@ -235,12 +231,10 @@ describe('Authentication Tests', () => {
       const { Logger: RealLogger } = require('../../src/utils/logger.js');
       
       const config = {
-        publicKey: 'pkey_test_1234567890',
         secretKey: 'skey_test_1234567890',
         environment: 'test' as const,
         apiVersion: '2017-11-02',
         baseUrl: 'https://api.omise.co',
-        vaultUrl: 'https://vault.omise.co',
         timeout: 30000,
         retryAttempts: 3,
         retryDelay: 1000
@@ -263,12 +257,10 @@ describe('Authentication Tests', () => {
       const { Logger: RealLogger } = require('../../src/utils/logger.js');
       
       const config = {
-        publicKey: 'pkey_1234567890',
         secretKey: 'skey_1234567890',
         environment: 'production' as const,
         apiVersion: '2017-11-02',
         baseUrl: 'https://api.omise.co',
-        vaultUrl: 'https://vault.omise.co',
         timeout: 30000,
         retryAttempts: 3,
         retryDelay: 1000

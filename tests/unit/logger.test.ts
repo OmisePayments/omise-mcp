@@ -84,12 +84,10 @@ describe('Logger', () => {
   function createServerConfig(overrides: Partial<ServerConfig> = {}): ServerConfig {
     return {
       omise: {
-        publicKey: 'pkey_test_1234567890',
         secretKey: 'skey_test_1234567890',
         environment: 'test',
         apiVersion: '2017-11-02',
         baseUrl: 'https://api.omise.co',
-        vaultUrl: 'https://vault.omise.co',
         timeout: 30000,
         retryAttempts: 3,
         retryDelay: 1000
@@ -98,19 +96,12 @@ describe('Logger', () => {
         name: 'test-server',
         version: '1.0.0',
         description: 'Test server',
-        port: 3000,
-        host: 'localhost'
       },
       logging: {
         level: 'info',
         format: 'simple',
         enableRequestLogging: false,
         enableResponseLogging: false
-      },
-      rateLimit: {
-        enabled: false,
-        maxRequests: 100,
-        windowMs: 60000
       },
       tools: {
         allowed: 'all'

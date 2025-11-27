@@ -7,7 +7,7 @@
 [![Docker](https://img.shields.io/badge/Docker-supported-blue.svg)](https://www.docker.com/)
 [![Release](https://img.shields.io/badge/release-alpha-orange.svg)](https://github.com/omise/omise-mcp/releases)
 
-**Omise MCP Server** is a comprehensive server for integrating with Omise payment APIs using [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). Implemented in TypeScript with full support for Omise API v2017-11-02.
+**Omise MCP Server** is a comprehensive server for integrating with Omise payment APIs using [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). Implemented in TypeScript with full support for Omise API v2019-05-29.
 
 > **⚠️ Alpha Release**: This is an alpha release for early adopters and testing. Some features may be experimental.
 
@@ -60,7 +60,7 @@
 - **Framework**: Model Context Protocol (MCP)
 - **HTTP Client**: Axios
 - **Logging**: Winston
-- **Testing**: Jest + MSW
+- **Testing**: Jest
 - **Containerization**: Docker + Docker Compose
 
 ## 🚀 Quick Start
@@ -86,15 +86,14 @@ npm install
 
 ```bash
 # Copy environment configuration file
-cp config/development.env .env
+cp config/production.env.example .env
+# Or use staging template: cp config/staging.env.example .env
 
 # Set environment variables
-export OMISE_PUBLIC_KEY=pkey_test_xxxxxxxxxxxxxxxx
 export OMISE_SECRET_KEY=skey_test_xxxxxxxxxxxxxxxx
 export OMISE_ENVIRONMENT=test
 export OMISE_API_VERSION=2019-05-29
 export OMISE_BASE_URL=https://api.omise.co
-export OMISE_VAULT_URL=https://vault.omise.co
 
 # Set tool access control (mandatory)
 export TOOLS=all  # For development only
@@ -106,17 +105,20 @@ export TOOLS=all  # For development only
 
 **For Development:**
 ```bash
-cp config/development.env .env
+# Copy example file and customize
+cp config/production.env.example .env
+# Edit .env and set OMISE_ENVIRONMENT=test
 # Use test API keys, enable verbose logging
 ```
 
 **For Production:**
 ```bash
-cp config/production.env .env
-# Use live API keys, optimized for performance
+# Copy example file and customize
+cp config/production.env.example .env
+# Edit .env and set:
 # OMISE_ENVIRONMENT=production
-# OMISE_PUBLIC_KEY=pkey_live_xxxxxxxxxxxxxxxx
 # OMISE_SECRET_KEY=skey_live_xxxxxxxxxxxxxxxx
+# Use live API keys, optimized for performance
 ```
 
 #### 2.5. Verify Configuration
@@ -126,7 +128,6 @@ cp config/production.env .env
 npm run dev
 
 # Or verify with a simple check
-echo $OMISE_PUBLIC_KEY | grep -q "pkey_" && echo "✅ Public key configured" || echo "❌ Public key missing"
 echo $OMISE_SECRET_KEY | grep -q "skey_" && echo "✅ Secret key configured" || echo "❌ Secret key missing"
 echo $TOOLS | grep -q "." && echo "✅ TOOLS configured: $TOOLS" || echo "❌ TOOLS not set (required)"
 ```
@@ -142,15 +143,6 @@ npm run build
 npm start
 ```
 
-### 4. Verify Installation
-
-```bash
-# Health check
-curl http://localhost:3000/health
-
-# Check available tools
-curl http://localhost:3000/tools
-```
 
 ## 📖 Usage
 
@@ -217,7 +209,6 @@ const transfer = await mcpClient.callTool('create_transfer', {
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `OMISE_PUBLIC_KEY` | Omise public key | ✓ | - |
 | `OMISE_SECRET_KEY` | Omise secret key | ✓ | - |
 | `OMISE_ENVIRONMENT` | Environment (test/production) | ✓ | - |
 | `TOOLS` | Comma-separated list of allowed tools or 'all' | ✓ | - |
@@ -229,8 +220,8 @@ const transfer = await mcpClient.callTool('create_transfer', {
 1. Access [Omise Dashboard](https://dashboard.omise.co/)
 2. Create an account or log in
 3. Get keys from the **API Keys** section
-4. **Test Environment**: Use keys starting with `pkey_test_` and `skey_test_`
-5. **Production Environment**: Use keys starting with `pkey_live_` and `skey_live_`
+4. **Test Environment**: Use keys starting with `skey_test_`
+5. **Production Environment**: Use keys starting with `skey_live_`
 
 > **Important**: Always use live keys in production and test keys in test environment.
 
@@ -260,19 +251,16 @@ omise-mcp-server/
 │       ├── config.ts            # Configuration management
 │       ├── logger.ts            # Logging functionality
 │       ├── omise-client.ts      # Omise API client
-│       ├── health-check.ts      # Health check
 │       └── index.ts             # Utility exports
 ├── tests/                        # Tests
 │   ├── unit/                     # Unit tests
 │   ├── integration/              # Integration tests
 │   ├── auth/                     # Authentication tests
 │   ├── error/                    # Error handling tests
-│   ├── rate-limit/               # Rate limiting tests
-│   ├── mocks/                    # Mocks
 │   └── factories/                # Test factories
 ├── config/                       # Configuration files
-│   ├── development.env.example  # Development template
-│   └── production.env.example   # Production template
+│   ├── production.env.example    # Production template
+│   └── staging.env.example      # Staging template
 ├── docker-compose.yml            # Docker Compose configuration
 ├── Dockerfile                    # Docker configuration
 ├── package.json                  # Dependencies
@@ -290,9 +278,6 @@ npm install
 
 # Start development server
 npm run dev
-
-# Watch mode
-npm run watch
 ```
 
 ### Testing
@@ -312,7 +297,6 @@ npm run test:unit
 npm run test:integration
 npm run test:auth
 npm run test:error
-npm run test:rate-limit
 ```
 
 ### Linting
@@ -320,9 +304,6 @@ npm run test:rate-limit
 ```bash
 # Run linting
 npm run lint
-
-# Auto-fix
-npm run lint:fix
 ```
 
 ### Build
@@ -341,7 +322,10 @@ npm run build:production
 
 ```bash
 # Start development environment
-docker-compose --env-file config/development.env up -d
+# First create your .env file from the example:
+# cp config/production.env.example .env
+# Edit .env with your test API keys
+docker-compose --env-file .env up -d
 
 # Check logs
 docker-compose logs -f omise-mcp-server
@@ -351,12 +335,10 @@ docker-compose logs -f omise-mcp-server
 
 ```bash
 # Start production environment
-docker-compose --env-file config/production.env up -d
-
-# Health check
-curl http://localhost:3000/health
-curl http://localhost:3000/ready
-curl http://localhost:3000/live
+# First create your .env file from the example:
+# cp config/production.env.example .env
+# Edit .env with your live API keys
+docker-compose --env-file .env up -d
 ```
 
 ## 🔒 Security
@@ -364,8 +346,6 @@ curl http://localhost:3000/live
 ### Security Features
 
 - **Non-root user**: Run containers as non-root user
-- **Security headers**: Proper HTTP header configuration
-- **Rate limiting**: API call restrictions
 - **Sensitive data masking**: Hide sensitive information in logs
 - **Environment isolation**: Complete separation of test and production environments
 - **Tool Access Control**: Granular control over which API tools clients can access
@@ -410,7 +390,6 @@ docker-compose up
 **Podman with specific tools:**
 ```bash
 podman run --rm -i \
-  -e OMISE_PUBLIC_KEY=pkey_test_xxx \
   -e OMISE_SECRET_KEY=skey_test_xxx \
   -e OMISE_ENVIRONMENT=test \
   -e TOOLS=create_charge,list_charges,create_customer \
@@ -488,7 +467,6 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
       "command": "docker",
       "args": [
         "run", "--rm", "-i",
-        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
         "-e", "OMISE_SECRET_KEY=skey_xxx",
         "-e", "OMISE_ENVIRONMENT=production",
         "-e", "TOOLS=all",
@@ -499,7 +477,6 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
       "command": "docker",
       "args": [
         "run", "--rm", "-i",
-        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
         "-e", "OMISE_SECRET_KEY=skey_xxx",
         "-e", "OMISE_ENVIRONMENT=production",
         "-e", "TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer",
@@ -510,7 +487,6 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
       "command": "docker",
       "args": [
         "run", "--rm", "-i",
-        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
         "-e", "OMISE_SECRET_KEY=skey_xxx",
         "-e", "OMISE_ENVIRONMENT=production",
         "-e", "TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_source",
@@ -538,11 +514,7 @@ docker-compose config
 #### 2. API Connection Issues
 
 ```bash
-# Check health check endpoint
-curl http://localhost:3000/health
-
 # Verify API keys
-echo $OMISE_PUBLIC_KEY | grep -q "pkey_" && echo "✅ Public key configured" || echo "❌ Missing"
 echo $OMISE_SECRET_KEY | grep -q "skey_" && echo "✅ Secret key configured" || echo "❌ Missing"
 ```
 

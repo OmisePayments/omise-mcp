@@ -67,25 +67,3 @@ export interface ServerInfo {
   supportedResources: string[];
 }
 
-export interface RateLimitInfo {
-  remaining: number;
-  resetTime: number;
-  limit: number;
-}
-
-export interface RequestContext {
-  requestId: string;
-  timestamp: string;
-  method: string;
-  url: string;
-  headers?: Record<string, string>;
-  body?: any;
-}
-
-export interface ResponseContext {
-  requestId: string;
-  status: number;
-  duration: number;
-  headers?: Record<string, string>;
-  body?: any;
-}

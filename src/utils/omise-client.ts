@@ -2,7 +2,7 @@
  * Omise API Client
  */
 
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { 
   OmiseConfig, 
   OmiseCharge, 
@@ -14,7 +14,6 @@ import {
   OmiseListResponse
 } from '../types/omise.js';
 import { Logger } from './logger.js';
-import { RequestContext, ResponseContext, RateLimitInfo } from '../types/mcp.js';
 
 // Extend Axios types to include custom metadata
 declare module 'axios' {
@@ -30,9 +29,6 @@ export class OmiseClient {
   private client: AxiosInstance;
   private config: OmiseConfig;
   private logger: Logger;
-  private rateLimitInfo: RateLimitInfo | null = null;
-  private requestQueue: Array<() => Promise<any>> = [];
-  private isProcessingQueue = false;
 
   constructor(config: OmiseConfig, logger: Logger) {
     this.config = config;
@@ -100,9 +96,6 @@ export class OmiseClient {
           });
         }
 
-        // Update rate limit information
-        this.updateRateLimitInfo(response.headers);
-
         return response;
       },
       (error: AxiosError) => {
@@ -118,11 +111,6 @@ export class OmiseClient {
           headers: error.response?.headers
         });
 
-        // Handle rate limit errors
-        if (error.response?.status === 429) {
-          this.handleRateLimitError(error);
-        }
-
         return Promise.reject(this.handleApiError(error));
       }
     );
@@ -130,33 +118,6 @@ export class OmiseClient {
 
   private generateRequestId(): string {
     return `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private updateRateLimitInfo(headers: any): void {
-    const remaining = headers['x-ratelimit-remaining'];
-    const resetTime = headers['x-ratelimit-reset'];
-    const limit = headers['x-ratelimit-limit'];
-
-    if (remaining !== undefined && resetTime !== undefined && limit !== undefined) {
-      this.rateLimitInfo = {
-        remaining: parseInt(remaining, 10),
-        resetTime: parseInt(resetTime, 10),
-        limit: parseInt(limit, 10)
-      };
-    }
-  }
-
-  private handleRateLimitError(error: AxiosError): void {
-    const retryAfter = error.response?.headers['retry-after'];
-    if (retryAfter) {
-      const delay = parseInt(retryAfter, 10) * 1000;
-      this.logger.warn(`Rate limit exceeded. Retrying after ${delay}ms`);
-      
-      // Add to retry queue
-      setTimeout(() => {
-        this.processQueue();
-      }, delay);
-    }
   }
 
   private handleApiError(error: AxiosError): Error {
@@ -185,7 +146,7 @@ export class OmiseClient {
       } catch (error) {
         lastError = error as Error;
         
-        // Do not retry rate limit errors or client errors
+        // Do not retry client errors (4xx)
         if (error instanceof AxiosError && error.response?.status && error.response.status < 500) {
           throw error;
         }
@@ -203,31 +164,6 @@ export class OmiseClient {
 
   private sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  private async processQueue(): Promise<void> {
-    if (this.isProcessingQueue || this.requestQueue.length === 0) {
-      return;
-    }
-    
-    this.isProcessingQueue = true;
-    
-    while (this.requestQueue.length > 0) {
-      const operation = this.requestQueue.shift();
-      if (operation) {
-        try {
-          await operation();
-        } catch (error) {
-          this.logger.error('Queue operation failed', error as Error);
-        }
-      }
-    }
-    
-    this.isProcessingQueue = false;
-  }
-
-  public getRateLimitInfo(): RateLimitInfo | null {
-    return this.rateLimitInfo;
   }
 
   // ============================================================================

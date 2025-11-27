@@ -12,10 +12,9 @@ import type {
   OmiseCustomer, 
   CreateChargeRequest,
   CreateCustomerRequest,
-  CreateTokenRequest,
   OmiseListResponse
 } from '../../src/types';
-import { createMockCharge, createMockCustomer, createMockToken } from '../factories';
+import { createMockCharge, createMockCustomer } from '../factories';
 
 // Mock axios
 jest.mock('axios');
@@ -68,8 +67,6 @@ describe('OmiseClient', () => {
     // Create mock config with faster settings for testing
     mockConfig = {
       baseUrl: 'https://api.omise.co',
-      vaultUrl: 'https://vault.omise.co',
-      publicKey: 'pkey_test_123',
       secretKey: 'skey_test_123',
       apiVersion: '2019-05-29',
       timeout: 1000, // Reduced from 30000ms to 1000ms for faster tests
@@ -205,44 +202,6 @@ describe('OmiseClient', () => {
       errorInterceptor = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[1];
     });
 
-    it('should log successful responses and update rate limit info', () => {
-      const response: AxiosResponse = {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-          'x-ratelimit-remaining': '95',
-          'x-ratelimit-reset': '1640995200',
-          'x-ratelimit-limit': '100'
-        },
-        data: { id: 'chrg_123', amount: 1000 },
-        config: {
-          metadata: {
-            requestId: 'req_123',
-            timestamp: new Date(Date.now() - 100).toISOString()
-          }
-        } as any
-      };
-
-      const result = responseInterceptor(response);
-
-      expect(result).toBe(response);
-      expect(mockLogger.info).toHaveBeenCalledWith('Omise API Response', {
-        requestId: 'req_123',
-        status: 200,
-        duration: expect.any(Number),
-        headers: response.headers,
-        data: response.data
-      });
-
-      // Check rate limit info was updated
-      const rateLimitInfo = omiseClient.getRateLimitInfo();
-      expect(rateLimitInfo).toEqual({
-        remaining: 95,
-        resetTime: 1640995200,
-        limit: 100
-      });
-    });
-
     it('should handle response without metadata', () => {
       const response: AxiosResponse = {
         status: 200,
@@ -262,31 +221,6 @@ describe('OmiseClient', () => {
         headers: {},
         data: { id: 'chrg_123' }
       });
-    });
-
-    it('should handle rate limit error (429)', () => {
-      const error = new AxiosError('Rate limit exceeded', '429');
-      error.response = {
-        status: 429,
-        headers: { 'retry-after': '60' },
-        data: { message: 'Rate limit exceeded' }
-      } as any;
-      error.config = {
-        metadata: {
-          requestId: 'req_123',
-          timestamp: new Date(Date.now() - 100).toISOString()
-        }
-      } as any;
-
-      expect(() => errorInterceptor?.(error)).rejects.toThrow();
-      expect(mockLogger.error).toHaveBeenCalledWith('Omise API Error', error, {
-        requestId: 'req_123',
-        status: 429,
-        duration: expect.any(Number),
-        data: { message: 'Rate limit exceeded' },
-        headers: { 'retry-after': '60' }
-      });
-      expect(mockLogger.warn).toHaveBeenCalledWith('Rate limit exceeded. Retrying after 60000ms');
     });
 
     it('should handle Omise API errors', () => {
@@ -336,58 +270,6 @@ describe('OmiseClient', () => {
       } as AxiosError;
 
       expect(() => errorInterceptor(error)).rejects.toThrow('Request failed: Something went wrong');
-    });
-  });
-
-  describe('rate limiting', () => {
-    it('should return null when no rate limit info available', () => {
-      const rateLimitInfo = omiseClient.getRateLimitInfo();
-      expect(rateLimitInfo).toBeNull();
-    });
-
-    it('should update rate limit info from headers', () => {
-      const responseInterceptor = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[0];
-      
-      const response: AxiosResponse = {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-          'x-ratelimit-remaining': '50',
-          'x-ratelimit-reset': '1640995200',
-          'x-ratelimit-limit': '100'
-        },
-        data: {},
-        config: {} as any
-      };
-
-      responseInterceptor?.(response);
-
-      const rateLimitInfo = omiseClient.getRateLimitInfo();
-      expect(rateLimitInfo).toEqual({
-        remaining: 50,
-        resetTime: 1640995200,
-        limit: 100
-      });
-    });
-
-    it('should handle partial rate limit headers', () => {
-      const responseInterceptor = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[0];
-      
-      const response: AxiosResponse = {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-          'x-ratelimit-remaining': '50'
-          // Missing reset and limit headers
-        },
-        data: {},
-        config: {} as any
-      };
-
-      responseInterceptor?.(response);
-
-      const rateLimitInfo = omiseClient.getRateLimitInfo();
-      expect(rateLimitInfo).toBeNull();
     });
   });
 
@@ -506,138 +388,6 @@ describe('OmiseClient', () => {
       
       // Should only be called once (early throw, no retry)
       expect(failingOperation).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('rate limit queue processing', () => {
-    beforeEach(() => {
-      // Restore setTimeout for queue tests since we need it to actually call processQueue
-      jest.restoreAllMocks();
-    });
-
-    it('should process queue when rate limit error occurs with retry-after header', async () => {
-      // Test processQueue through rate limit error handling
-      const errorInterceptor = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[1];
-      
-      const axiosError: AxiosError = new AxiosError('Rate limit exceeded');
-      axiosError.isAxiosError = true;
-      axiosError.response = {
-        status: 429,
-        statusText: 'Too Many Requests',
-        headers: { 'retry-after': '1' },
-        data: { message: 'Rate limit exceeded' },
-        config: {
-          metadata: {
-            requestId: 'req_123',
-            timestamp: new Date().toISOString()
-          }
-        } as any
-      };
-
-      // Access private requestQueue and populate it to test processQueue logic
-      const requestQueue = (omiseClient as any).requestQueue as Array<() => Promise<any>>;
-      
-      // Add a mock operation to the queue
-      const mockOperation = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
-      requestQueue.push(mockOperation);
-
-      // Mock setTimeout to call the function immediately
-      const setTimeoutSpy = jest.spyOn(global, 'setTimeout').mockImplementation((fn: any) => {
-        fn(); // Execute immediately
-        return {} as any;
-      });
-
-      try {
-        await errorInterceptor?.(axiosError);
-      } catch (e) {
-        // Expected to throw after transformation
-      }
-
-      // Verify setTimeout was called (which calls processQueue)
-      expect(setTimeoutSpy).toHaveBeenCalled();
-      
-      setTimeoutSpy.mockRestore();
-    });
-
-    it('should handle queue processing with multiple operations', async () => {
-      const errorInterceptor = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[1];
-      
-      const axiosError: AxiosError = new AxiosError('Rate limit exceeded');
-      axiosError.isAxiosError = true;
-      axiosError.response = {
-        status: 429,
-        statusText: 'Too Many Requests',
-        headers: { 'retry-after': '1' },
-        data: { message: 'Rate limit exceeded' },
-        config: {
-          metadata: {
-            requestId: 'req_123',
-            timestamp: new Date().toISOString()
-          }
-        } as any
-      };
-
-      // Access private queue and add multiple operations
-      const requestQueue = (omiseClient as any).requestQueue as Array<() => Promise<any>>;
-      
-      const mockOperation1 = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
-      const mockOperation2 = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
-      requestQueue.push(mockOperation1, mockOperation2);
-
-      const setTimeoutSpy = jest.spyOn(global, 'setTimeout').mockImplementation((fn: any) => {
-        fn(); // Execute immediately
-        return {} as any;
-      });
-
-      try {
-        await errorInterceptor?.(axiosError);
-      } catch (e) {
-        // Expected
-      }
-
-      expect(setTimeoutSpy).toHaveBeenCalled();
-      setTimeoutSpy.mockRestore();
-    });
-
-    it('should handle queue processing errors gracefully', async () => {
-      const errorInterceptor = mockAxiosInstance.interceptors.response.use.mock.calls[0]?.[1];
-      
-      const axiosError: AxiosError = new AxiosError('Rate limit exceeded');
-      axiosError.isAxiosError = true;
-      axiosError.response = {
-        status: 429,
-        statusText: 'Too Many Requests',
-        headers: { 'retry-after': '1' },
-        data: { message: 'Rate limit exceeded' },
-        config: {
-          metadata: {
-            requestId: 'req_123',
-            timestamp: new Date().toISOString()
-          }
-        } as any
-      };
-
-      // Access private queue and add a failing operation
-      const requestQueue = (omiseClient as any).requestQueue as Array<() => Promise<any>>;
-      
-      const failingOperation = jest.fn<() => Promise<void>>().mockRejectedValue(new Error('Operation failed'));
-      requestQueue.push(failingOperation);
-
-      const setTimeoutSpy = jest.spyOn(global, 'setTimeout').mockImplementation((fn: any) => {
-        fn(); // Execute immediately
-        return {} as any;
-      });
-
-      try {
-        await errorInterceptor?.(axiosError);
-      } catch (e) {
-        // Expected
-      }
-
-      expect(setTimeoutSpy).toHaveBeenCalled();
-      expect(mockLogger.error).toHaveBeenCalledWith('Queue operation failed', expect.any(Error));
-      
-      setTimeoutSpy.mockRestore();
     });
   });
 
