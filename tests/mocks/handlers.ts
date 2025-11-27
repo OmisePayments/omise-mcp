@@ -7,7 +7,6 @@ import { faker } from '@faker-js/faker';
 import { 
   createMockCharge, 
   createMockCustomer, 
-  createMockToken, 
   createMockTransfer, 
   createMockRecipient, 
   createMockRefund, 
@@ -108,17 +107,6 @@ export const handlers = [
 
   http.delete('https://api.omise.co/customers/:id', ({ params }) => {
     return HttpResponse.json(createMockCustomer({ id: params.id as string, deleted: true }));
-  }),
-
-  // ============================================================================
-  // Token API Mock
-  // ============================================================================
-  http.post('https://api.omise.co/tokens', () => {
-    return HttpResponse.json(createMockToken());
-  }),
-
-  http.get('https://api.omise.co/tokens/:id', ({ params }) => {
-    return HttpResponse.json(createMockToken({ id: params.id as string }));
   }),
 
   // ============================================================================

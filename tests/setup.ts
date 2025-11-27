@@ -11,7 +11,6 @@ jest.setTimeout(30000);
 
 // Mock environment variables
 process.env.NODE_ENV = 'test';
-process.env.OMISE_PUBLIC_KEY = 'test-public-key';
 process.env.OMISE_SECRET_KEY = 'test-secret-key';
 process.env.OMISE_API_URL = 'https://api.omise.co';
 process.env.LOG_LEVEL = 'error';

@@ -26,7 +26,6 @@ describe('Tool Access Control Integration', () => {
       
       // Set required Omise env vars
       process.env = {
-        OMISE_PUBLIC_KEY: 'pkey_test_123',
         OMISE_SECRET_KEY: 'skey_test_123',
         OMISE_ENVIRONMENT: 'test'
       } as any;
@@ -36,7 +35,6 @@ describe('Tool Access Control Integration', () => {
 
     it('should fail to start with empty TOOLS environment variable', async () => {
       process.env.TOOLS = '';
-      process.env.OMISE_PUBLIC_KEY = 'pkey_test_123';
       process.env.OMISE_SECRET_KEY = 'skey_test_123';
       process.env.OMISE_ENVIRONMENT = 'test';
 
@@ -47,7 +45,6 @@ describe('Tool Access Control Integration', () => {
 
     it('should fail to start with whitespace-only TOOLS', async () => {
       process.env.TOOLS = '   ';
-      process.env.OMISE_PUBLIC_KEY = 'pkey_test_123';
       process.env.OMISE_SECRET_KEY = 'skey_test_123';
       process.env.OMISE_ENVIRONMENT = 'test';
 
@@ -58,7 +55,6 @@ describe('Tool Access Control Integration', () => {
 
     it('should start successfully with TOOLS=all', async () => {
       process.env.TOOLS = 'all';
-      process.env.OMISE_PUBLIC_KEY = 'pkey_test_123';
       process.env.OMISE_SECRET_KEY = 'skey_test_123';
       process.env.OMISE_ENVIRONMENT = 'test';
 
@@ -70,7 +66,6 @@ describe('Tool Access Control Integration', () => {
 
     it('should start successfully with specific tools', async () => {
       process.env.TOOLS = 'create_charge,list_charges';
-      process.env.OMISE_PUBLIC_KEY = 'pkey_test_123';
       process.env.OMISE_SECRET_KEY = 'skey_test_123';
       process.env.OMISE_ENVIRONMENT = 'test';
 
@@ -141,7 +136,6 @@ describe('Tool Access Control Integration', () => {
   describe('Configuration Loading', () => {
     it('should load TOOLS from environment and add to config', async () => {
       process.env.TOOLS = 'create_charge,list_charges,create_customer';
-      process.env.OMISE_PUBLIC_KEY = 'pkey_test_123';
       process.env.OMISE_SECRET_KEY = 'skey_test_123';
       process.env.OMISE_ENVIRONMENT = 'test';
 
@@ -156,7 +150,6 @@ describe('Tool Access Control Integration', () => {
 
     it('should maintain TOOLS configuration integrity', async () => {
       process.env.TOOLS = 'create_charge,retrieve_charge,list_charges';
-      process.env.OMISE_PUBLIC_KEY = 'pkey_test_123';
       process.env.OMISE_SECRET_KEY = 'skey_test_123';
       process.env.OMISE_ENVIRONMENT = 'test';
 

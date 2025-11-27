@@ -51,9 +51,8 @@ check_prerequisites() {
     fi
     
     # Check if required environment variables are set
-    if [ -z "$OMISE_PUBLIC_KEY" ] || [ -z "$OMISE_SECRET_KEY" ]; then
+    if [ -z "$OMISE_SECRET_KEY" ]; then
         log_error "Required environment variables are not set:"
-        log_error "  - OMISE_PUBLIC_KEY"
         log_error "  - OMISE_SECRET_KEY"
         exit 1
     fi

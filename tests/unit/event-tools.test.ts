@@ -20,9 +20,7 @@ describe('EventTools', () => {
   beforeEach(() => {
     mockOmiseClient = new OmiseClient({
       baseUrl: 'https://api.omise.co',
-      publicKey: 'pkey_test_123',
       secretKey: 'skey_test_123',
-      vaultUrl: 'https://vault.omise.co'
     } as any, {} as any) as jest.Mocked<OmiseClient>;
     mockLogger = new Logger({} as any) as jest.Mocked<Logger>;
     eventTools = new EventTools(mockOmiseClient, mockLogger);

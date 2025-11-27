@@ -107,7 +107,6 @@ The test suite uses the following environment variables:
 
 ```bash
 NODE_ENV=test
-OMISE_PUBLIC_KEY=test-public-key
 OMISE_SECRET_KEY=test-secret-key
 OMISE_API_URL=https://api.omise.co
 LOG_LEVEL=error

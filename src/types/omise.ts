@@ -151,16 +151,6 @@ export interface OmiseCard extends OmiseBaseObject {
 }
 
 // ============================================================================
-// Token
-// ============================================================================
-
-export interface OmiseToken extends OmiseBaseObject {
-  object: 'token';
-  used: boolean;
-  card: OmiseCard;
-}
-
-// ============================================================================
 // Transfer
 // ============================================================================
 
@@ -440,18 +430,6 @@ export interface CreateCustomerRequest {
   description?: string;
   card?: string;
   metadata?: OmiseMetadata;
-}
-
-export interface CreateTokenRequest {
-  card: {
-    name: string;
-    number: string;
-    expiration_month: number;
-    expiration_year: number;
-    city?: string;
-    postal_code?: string;
-    security_code?: string;
-  };
 }
 
 export interface CreateTransferRequest {

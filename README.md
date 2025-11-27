@@ -89,12 +89,10 @@ npm install
 cp config/development.env .env
 
 # Set environment variables
-export OMISE_PUBLIC_KEY=pkey_test_xxxxxxxxxxxxxxxx
 export OMISE_SECRET_KEY=skey_test_xxxxxxxxxxxxxxxx
 export OMISE_ENVIRONMENT=test
 export OMISE_API_VERSION=2019-05-29
 export OMISE_BASE_URL=https://api.omise.co
-export OMISE_VAULT_URL=https://vault.omise.co
 
 # Set tool access control (mandatory)
 export TOOLS=all  # For development only
@@ -115,7 +113,6 @@ cp config/development.env .env
 cp config/production.env .env
 # Use live API keys, optimized for performance
 # OMISE_ENVIRONMENT=production
-# OMISE_PUBLIC_KEY=pkey_live_xxxxxxxxxxxxxxxx
 # OMISE_SECRET_KEY=skey_live_xxxxxxxxxxxxxxxx
 ```
 
@@ -126,7 +123,6 @@ cp config/production.env .env
 npm run dev
 
 # Or verify with a simple check
-echo $OMISE_PUBLIC_KEY | grep -q "pkey_" && echo "✅ Public key configured" || echo "❌ Public key missing"
 echo $OMISE_SECRET_KEY | grep -q "skey_" && echo "✅ Secret key configured" || echo "❌ Secret key missing"
 echo $TOOLS | grep -q "." && echo "✅ TOOLS configured: $TOOLS" || echo "❌ TOOLS not set (required)"
 ```
@@ -142,15 +138,6 @@ npm run build
 npm start
 ```
 
-### 4. Verify Installation
-
-```bash
-# Health check
-curl http://localhost:3000/health
-
-# Check available tools
-curl http://localhost:3000/tools
-```
 
 ## 📖 Usage
 
@@ -217,7 +204,6 @@ const transfer = await mcpClient.callTool('create_transfer', {
 
 | Variable | Description | Required | Default |
 |----------|-------------|----------|---------|
-| `OMISE_PUBLIC_KEY` | Omise public key | ✓ | - |
 | `OMISE_SECRET_KEY` | Omise secret key | ✓ | - |
 | `OMISE_ENVIRONMENT` | Environment (test/production) | ✓ | - |
 | `TOOLS` | Comma-separated list of allowed tools or 'all' | ✓ | - |
@@ -229,8 +215,8 @@ const transfer = await mcpClient.callTool('create_transfer', {
 1. Access [Omise Dashboard](https://dashboard.omise.co/)
 2. Create an account or log in
 3. Get keys from the **API Keys** section
-4. **Test Environment**: Use keys starting with `pkey_test_` and `skey_test_`
-5. **Production Environment**: Use keys starting with `pkey_live_` and `skey_live_`
+4. **Test Environment**: Use keys starting with `skey_test_`
+5. **Production Environment**: Use keys starting with `skey_live_`
 
 > **Important**: Always use live keys in production and test keys in test environment.
 
@@ -410,7 +396,6 @@ docker-compose up
 **Podman with specific tools:**
 ```bash
 podman run --rm -i \
-  -e OMISE_PUBLIC_KEY=pkey_test_xxx \
   -e OMISE_SECRET_KEY=skey_test_xxx \
   -e OMISE_ENVIRONMENT=test \
   -e TOOLS=create_charge,list_charges,create_customer \
@@ -488,7 +473,6 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
       "command": "docker",
       "args": [
         "run", "--rm", "-i",
-        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
         "-e", "OMISE_SECRET_KEY=skey_xxx",
         "-e", "OMISE_ENVIRONMENT=production",
         "-e", "TOOLS=all",
@@ -499,7 +483,6 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
       "command": "docker",
       "args": [
         "run", "--rm", "-i",
-        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
         "-e", "OMISE_SECRET_KEY=skey_xxx",
         "-e", "OMISE_ENVIRONMENT=production",
         "-e", "TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer",
@@ -510,7 +493,6 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
       "command": "docker",
       "args": [
         "run", "--rm", "-i",
-        "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
         "-e", "OMISE_SECRET_KEY=skey_xxx",
         "-e", "OMISE_ENVIRONMENT=production",
         "-e", "TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_source",
@@ -542,7 +524,6 @@ docker-compose config
 curl http://localhost:3000/health
 
 # Verify API keys
-echo $OMISE_PUBLIC_KEY | grep -q "pkey_" && echo "✅ Public key configured" || echo "❌ Missing"
 echo $OMISE_SECRET_KEY | grep -q "skey_" && echo "✅ Secret key configured" || echo "❌ Missing"
 ```
 

@@ -47,12 +47,10 @@ describe('API Integration Tests', () => {
     // Initialize client for integration tests
     // All HTTP requests will be mocked via axios
     const config = {
-      publicKey: 'pkey_test_1234567890',
       secretKey: 'skey_test_1234567890',
       environment: 'test' as const,
       apiVersion: '2017-11-02',
       baseUrl: 'https://api.omise.co',
-      vaultUrl: 'https://vault.omise.co',
       timeout: 30000,
       retryAttempts: 3,
       retryDelay: 1000

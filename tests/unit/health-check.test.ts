@@ -43,12 +43,10 @@ describe('HealthChecker', () => {
     // Create mock config
     mockConfig = {
       omise: {
-        publicKey: 'pkey_test_123',
         secretKey: 'skey_test_123',
         environment: 'test',
         apiVersion: '2019-05-29',
         baseUrl: 'https://api.omise.co',
-        vaultUrl: 'https://vault.omise.co',
         timeout: 30000,
         retryAttempts: 3,
         retryDelay: 1000

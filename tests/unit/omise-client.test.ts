@@ -12,10 +12,9 @@ import type {
   OmiseCustomer, 
   CreateChargeRequest,
   CreateCustomerRequest,
-  CreateTokenRequest,
   OmiseListResponse
 } from '../../src/types';
-import { createMockCharge, createMockCustomer, createMockToken } from '../factories';
+import { createMockCharge, createMockCustomer } from '../factories';
 
 // Mock axios
 jest.mock('axios');
@@ -68,8 +67,6 @@ describe('OmiseClient', () => {
     // Create mock config with faster settings for testing
     mockConfig = {
       baseUrl: 'https://api.omise.co',
-      vaultUrl: 'https://vault.omise.co',
-      publicKey: 'pkey_test_123',
       secretKey: 'skey_test_123',
       apiVersion: '2019-05-29',
       timeout: 1000, // Reduced from 30000ms to 1000ms for faster tests
