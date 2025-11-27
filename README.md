@@ -252,7 +252,6 @@ omise-mcp-server/
 │   ├── integration/              # Integration tests
 │   ├── auth/                     # Authentication tests
 │   ├── error/                    # Error handling tests
-│   ├── rate-limit/               # Rate limiting tests
 │   ├── mocks/                    # Mocks
 │   └── factories/                # Test factories
 ├── config/                       # Configuration files
@@ -297,7 +296,6 @@ npm run test:unit
 npm run test:integration
 npm run test:auth
 npm run test:error
-npm run test:rate-limit
 ```
 
 ### Linting
@@ -345,7 +343,6 @@ docker-compose --env-file config/production.env up -d
 
 - **Non-root user**: Run containers as non-root user
 - **Security headers**: Proper HTTP header configuration
-- **Rate limiting**: API call restrictions
 - **Sensitive data masking**: Hide sensitive information in logs
 - **Environment isolation**: Complete separation of test and production environments
 - **Tool Access Control**: Granular control over which API tools clients can access

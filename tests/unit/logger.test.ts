@@ -103,11 +103,7 @@ describe('Logger', () => {
         enableRequestLogging: false,
         enableResponseLogging: false
       },
-      rateLimit: {
-        enabled: false,
-        maxRequests: 100,
-        windowMs: 60000
-      },
+,
       tools: {
         allowed: 'all'
       },

@@ -395,9 +395,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'test-server',
           version: '1.0.0',
-          description: 'Test server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Test server'
         },
         logging: {
           level: 'info',
@@ -429,9 +427,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'prod-server',
           version: '1.0.0',
-          description: 'Production server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Production server'
         },
         logging: {
           level: 'info',
@@ -464,9 +460,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'prod-server',
           version: '1.0.0',
-          description: 'Production server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Production server'
         },
         logging: {
           level: 'info',
@@ -498,9 +492,7 @@ describe('Configuration Management', () => {
         server: {
           name: 'test-server',
           version: '1.0.0',
-          description: 'Test server',
-          port: 3000,
-          host: 'localhost'
+          description: 'Test server'
         },
         logging: {
           level: 'info',

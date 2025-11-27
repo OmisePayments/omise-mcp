@@ -419,26 +419,6 @@ export const handlers = [
   }),
 
   // ============================================================================
-  // Rate Limit Error Mock
-  // ============================================================================
-  http.get('https://api.omise.co/rate-limit-test', () => {
-    return HttpResponse.json({
-      object: 'error',
-      location: '/rate-limit-test',
-      code: 'rate_limit_exceeded',
-      message: 'Rate limit exceeded'
-    }, { 
-      status: 429,
-      headers: {
-        'Retry-After': '60',
-        'X-RateLimit-Limit': '100',
-        'X-RateLimit-Remaining': '0',
-        'X-RateLimit-Reset': '1640995200'
-      }
-    });
-  }),
-
-  // ============================================================================
   // Timeout Error Mock
   // ============================================================================
   http.get('https://api.omise.co/timeout-test', () => {
