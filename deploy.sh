@@ -110,11 +110,11 @@ run_health_checks() {
     # Wait for services to start
     sleep 30
     
-    # Check if the main service is healthy
-    if curl -f http://localhost:3000/health > /dev/null 2>&1; then
-        log_info "Health check passed."
+    # Check if the main service process is running (MCP stdio server doesn't expose HTTP endpoints)
+    if pgrep -f "node.*index.js" > /dev/null 2>&1; then
+        log_info "Health check passed - service process is running."
     else
-        log_error "Health check failed. Service is not responding."
+        log_error "Health check failed. Service process is not running."
         exit 1
     fi
 }

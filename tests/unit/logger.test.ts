@@ -96,8 +96,6 @@ describe('Logger', () => {
         name: 'test-server',
         version: '1.0.0',
         description: 'Test server',
-        port: 3000,
-        host: 'localhost'
       },
       logging: {
         level: 'info',

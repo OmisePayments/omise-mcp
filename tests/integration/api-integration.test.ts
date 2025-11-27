@@ -58,7 +58,7 @@ describe('API Integration Tests', () => {
 
     logger = new Logger({
       omise: config,
-      server: { name: 'test', version: '1.0.0', description: 'Test', port: 3000, host: 'localhost' },
+      server: { name: 'test', version: '1.0.0', description: 'Test'},
       logging: { level: 'error', format: 'simple', enableRequestLogging: false, enableResponseLogging: false },
       tools: { allowed: 'all' }
     });

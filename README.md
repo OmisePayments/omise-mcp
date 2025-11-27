@@ -246,7 +246,6 @@ omise-mcp-server/
 │       ├── config.ts            # Configuration management
 │       ├── logger.ts            # Logging functionality
 │       ├── omise-client.ts      # Omise API client
-│       ├── health-check.ts      # Health check
 │       └── index.ts             # Utility exports
 ├── tests/                        # Tests
 │   ├── unit/                     # Unit tests
@@ -338,11 +337,6 @@ docker-compose logs -f omise-mcp-server
 ```bash
 # Start production environment
 docker-compose --env-file config/production.env up -d
-
-# Health check
-curl http://localhost:3000/health
-curl http://localhost:3000/ready
-curl http://localhost:3000/live
 ```
 
 ## 🔒 Security
@@ -520,9 +514,6 @@ docker-compose config
 #### 2. API Connection Issues
 
 ```bash
-# Check health check endpoint
-curl http://localhost:3000/health
-
 # Verify API keys
 echo $OMISE_SECRET_KEY | grep -q "skey_" && echo "✅ Secret key configured" || echo "❌ Missing"
 ```
