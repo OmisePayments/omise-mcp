@@ -5,6 +5,9 @@ package-lock.json
 # Build outputs
 dist/
 
+# Testing
+coverage/
+
 # IDE
 .idea/
 *.iml

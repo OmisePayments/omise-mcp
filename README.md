@@ -15,7 +15,6 @@
 
 ### 💳 Payment Processing
 - **Charge Management**: Create, retrieve, update, capture, and reverse payments
-- **Tokenization**: Secure card information tokenization
 - **Source Management**: Support for various payment methods
 - **Refunds**: Partial and full refund processing
 
@@ -43,7 +42,7 @@
 
 | Category | Features | Tool Count | Documentation |
 |---------|----------|------------|---------------|
-| **Payment** | Charges (7), Tokens (2), Sources (2) | 11 | [Omise Charges API](https://www.omise.co/charges-api) |
+| **Payment** | Charges (7), Sources (2) | 9 | [Omise Charges API](https://www.omise.co/charges-api) |
 | **Customer** | Customer & Card Management | 9 | [Omise Customers API](https://www.omise.co/customers-api) |
 | **Transfer** | Transfers (5) & Recipients (6) | 11 | [Omise Transfers API](https://www.omise.co/transfers-api) |
 | **Refund** | Refund Processing | 3 | [Omise Refunds API](https://www.omise.co/refunds-api) |
@@ -52,7 +51,7 @@
 | **Event** | Event Management | 2 | [Omise Events API](https://www.omise.co/events-api) |
 | **Capability** | Feature Verification | 1 | [Omise Capabilities API](https://www.omise.co/capabilities-api) |
 
-**Total: 50 tools** covering all active Omise Core API functionality
+**Total: 48 tools** covering all active Omise Core API functionality
 
 ## 🛠️ Technology Stack
 
@@ -171,17 +170,6 @@ const customer = await mcpClient.callTool('create_customer', {
     email: 'customer@example.com',
     description: 'Test customer'
 });
-
-// Create a card token
-const token = await mcpClient.callTool('create_token', {
-    card: {
-        name: 'John Doe',
-        number: '4242424242424242',
-        expiration_month: 12,
-        expiration_year: 2025,
-        security_code: '123'
-    }
-});
 ```
 
 ### Recurring Payment Setup
@@ -259,7 +247,6 @@ omise-mcp-server/
 │   ├── tools/                    # Tool implementations
 │   │   ├── payment-tools.ts     # Payment-related tools
 │   │   ├── customer-tools.ts    # Customer-related tools
-│   │   ├── token-tools.ts       # Token-related tools
 │   │   ├── source-tools.ts      # Source-related tools
 │   │   ├── transfer-tools.ts    # Transfer-related tools
 │   │   ├── recipient-tools.ts  # Recipient-related tools
@@ -392,12 +379,12 @@ The MCP server requires explicit tool access configuration for enhanced security
 Set the `TOOLS` environment variable (**mandatory**). The server will not start without this configuration.
 
 **Options:**
-- `TOOLS=all` - Full access to all 50 tools (development only, not recommended for production)
+- `TOOLS=all` - Full access to all 48 tools (development only, not recommended for production)
 - `TOOLS=tool1,tool2,...` - Comma-separated list of specific tools (recommended for production)
 
 **Common Patterns:**
 - **Read-only access**: `TOOLS=list_charges,retrieve_charge,list_customers,retrieve_customer`
-- **Payment processing**: `TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_token`
+- **Payment processing**: `TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_source`
 - **Finance operations**: `TOOLS=list_charges,retrieve_charge,create_refund,create_transfer`
 
 #### Examples
@@ -416,7 +403,7 @@ docker-compose up
 
 **Payment processing only:**
 ```bash
-export TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_token
+export TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_source
 docker-compose up
 ```
 
@@ -437,7 +424,6 @@ podman run --rm -i \
 | **Charges** | `create_charge`, `retrieve_charge`, `list_charges`, `update_charge`, `capture_charge`, `reverse_charge`, `expire_charge` | Payment charge operations |
 | **Customers** | `create_customer`, `retrieve_customer`, `list_customers`, `update_customer`, `destroy_customer` | Customer management |
 | **Cards** | `list_customer_cards`, `retrieve_customer_card`, `update_customer_card`, `destroy_customer_card` | Card management |
-| **Tokens** | `create_token`, `retrieve_token` | Tokenization |
 | **Sources** | `create_source`, `retrieve_source` | Payment sources |
 | **Transfers** | `create_transfer`, `retrieve_transfer`, `list_transfers`, `update_transfer`, `destroy_transfer` | Transfer operations |
 | **Recipients** | `create_recipient`, `retrieve_recipient`, `list_recipients`, `update_recipient`, `destroy_recipient`, `verify_recipient` | Recipient management |
@@ -467,7 +453,7 @@ Example: TOOLS=create_charge,list_charges,create_customer
 
 # Invalid tool names
 Error: Invalid tool names: hello, invalid_tool
-Valid tools are: create_charge, retrieve_charge, list_charges, ... (50 total)
+Valid tools are: create_charge, retrieve_charge, list_charges, ... (48 total)
 Use TOOLS=all for full access.
 ```
 
@@ -484,7 +470,7 @@ When `TOOLS` is properly configured:
 2. **Production Restrictions**: Never use `TOOLS=all` in production - always specify exact tools
 3. **Role-Based Deployment**: Run separate MCP server instances for different user roles:
    - **Read-Only (Analytics/Support)**: `list_charges,retrieve_charge,list_customers,retrieve_customer`
-   - **Payment Processing (Merchants)**: `create_charge,retrieve_charge,capture_charge,create_customer,create_token`
+   - **Payment Processing (Merchants)**: `create_charge,retrieve_charge,capture_charge,create_customer,create_source`
    - **Finance Operations**: `list_charges,create_refund,create_transfer,create_recipient`
    - **Admin (Development/Emergency)**: `all` (use with caution)
 4. **Regular Audits**: Review and document tool access configurations periodically
@@ -527,7 +513,7 @@ Use Cursor's `mcp.json` to configure multiple clients with different access leve
         "-e", "OMISE_PUBLIC_KEY=pkey_xxx",
         "-e", "OMISE_SECRET_KEY=skey_xxx",
         "-e", "OMISE_ENVIRONMENT=production",
-        "-e", "TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_token",
+        "-e", "TOOLS=create_charge,retrieve_charge,capture_charge,create_customer,create_source",
         "omise-mcp-server:latest"
       ]
     }
@@ -631,20 +617,6 @@ Retrieve customer information.
 **Parameters:**
 - `customer_id` (required): Customer ID to retrieve
 
-### Token Tools
-
-#### create_token
-Create a secure card token for payment processing.
-
-**Parameters:**
-- `card` (required): Card information
-    - `name` (required): Cardholder name
-    - `number` (required): Card number
-    - `expiration_month` (required): Expiration month (1-12)
-    - `expiration_year` (required): Expiration year (4 digits)
-    - `city` (optional): Billing address city
-    - `postal_code` (optional): Billing address postal code
-    - `security_code` (optional): Security code (CVV/CVC)
 
 ## 🔗 External Links
 
@@ -695,8 +667,8 @@ Contributions to the project are welcome! Please follow these steps:
 
 ## 📊 Statistics
 
-- **Total Tools**: 50
-- **Supported APIs**: 11 categories
+- **Total Tools**: 48
+- **Supported APIs**: 8 categories
 - **Test Coverage**: 95%+
 - **TypeScript**: 100%
 - **Docker Support**: ✅
