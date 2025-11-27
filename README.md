@@ -7,7 +7,7 @@
 [![Docker](https://img.shields.io/badge/Docker-supported-blue.svg)](https://www.docker.com/)
 [![Release](https://img.shields.io/badge/release-alpha-orange.svg)](https://github.com/omise/omise-mcp/releases)
 
-**Omise MCP Server** is a comprehensive server for integrating with Omise payment APIs using [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). Implemented in TypeScript with full support for Omise API v2017-11-02.
+**Omise MCP Server** is a comprehensive server for integrating with Omise payment APIs using [Model Context Protocol (MCP)](https://modelcontextprotocol.io/). Implemented in TypeScript with full support for Omise API v2019-05-29.
 
 > **⚠️ Alpha Release**: This is an alpha release for early adopters and testing. Some features may be experimental.
 
@@ -86,7 +86,8 @@ npm install
 
 ```bash
 # Copy environment configuration file
-cp config/development.env .env
+cp config/production.env.example .env
+# Or use staging template: cp config/staging.env.example .env
 
 # Set environment variables
 export OMISE_SECRET_KEY=skey_test_xxxxxxxxxxxxxxxx
@@ -104,16 +105,20 @@ export TOOLS=all  # For development only
 
 **For Development:**
 ```bash
-cp config/development.env .env
+# Copy example file and customize
+cp config/production.env.example .env
+# Edit .env and set OMISE_ENVIRONMENT=test
 # Use test API keys, enable verbose logging
 ```
 
 **For Production:**
 ```bash
-cp config/production.env .env
-# Use live API keys, optimized for performance
+# Copy example file and customize
+cp config/production.env.example .env
+# Edit .env and set:
 # OMISE_ENVIRONMENT=production
 # OMISE_SECRET_KEY=skey_live_xxxxxxxxxxxxxxxx
+# Use live API keys, optimized for performance
 ```
 
 #### 2.5. Verify Configuration
@@ -252,11 +257,10 @@ omise-mcp-server/
 │   ├── integration/              # Integration tests
 │   ├── auth/                     # Authentication tests
 │   ├── error/                    # Error handling tests
-│   ├── mocks/                    # Mocks
 │   └── factories/                # Test factories
 ├── config/                       # Configuration files
-│   ├── development.env.example  # Development template
-│   └── production.env.example   # Production template
+│   ├── production.env.example    # Production template
+│   └── staging.env.example      # Staging template
 ├── docker-compose.yml            # Docker Compose configuration
 ├── Dockerfile                    # Docker configuration
 ├── package.json                  # Dependencies
@@ -274,9 +278,6 @@ npm install
 
 # Start development server
 npm run dev
-
-# Watch mode
-npm run watch
 ```
 
 ### Testing
@@ -303,9 +304,6 @@ npm run test:error
 ```bash
 # Run linting
 npm run lint
-
-# Auto-fix
-npm run lint:fix
 ```
 
 ### Build
@@ -324,7 +322,10 @@ npm run build:production
 
 ```bash
 # Start development environment
-docker-compose --env-file config/development.env up -d
+# First create your .env file from the example:
+# cp config/production.env.example .env
+# Edit .env with your test API keys
+docker-compose --env-file .env up -d
 
 # Check logs
 docker-compose logs -f omise-mcp-server
@@ -334,7 +335,10 @@ docker-compose logs -f omise-mcp-server
 
 ```bash
 # Start production environment
-docker-compose --env-file config/production.env up -d
+# First create your .env file from the example:
+# cp config/production.env.example .env
+# Edit .env with your live API keys
+docker-compose --env-file .env up -d
 ```
 
 ## 🔒 Security
@@ -342,7 +346,6 @@ docker-compose --env-file config/production.env up -d
 ### Security Features
 
 - **Non-root user**: Run containers as non-root user
-- **Security headers**: Proper HTTP header configuration
 - **Sensitive data masking**: Hide sensitive information in logs
 - **Environment isolation**: Complete separation of test and production environments
 - **Tool Access Control**: Granular control over which API tools clients can access
