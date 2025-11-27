@@ -306,24 +306,6 @@ export interface OmiseScheduleOccurrence extends OmiseOccurrence {
 }
 
 // ============================================================================
-// Link (Payment Link)
-// ============================================================================
-
-export interface OmiseLink extends OmiseBaseObject {
-  object: 'link';
-  amount: number;
-  currency: string;
-  used: boolean;
-  used_at?: string;
-  description?: string;
-  title?: string;
-  link_type: 'payment';
-  payment_uri: string;
-  charges?: OmiseListResponse<OmiseCharge>;
-  metadata?: OmiseMetadata;
-}
-
-// ============================================================================
 // Source (Payment Source)
 // ============================================================================
 
@@ -362,51 +344,6 @@ export interface OmiseReferences {
 // ============================================================================
 // Capability
 // ============================================================================
-
-export interface OmiseCapability extends OmiseBaseObject {
-  object: 'capability';
-  banks: OmiseBank[];
-  payment_methods: OmisePaymentMethod[];
-}
-
-export interface OmiseBank {
-  code: string;
-  name: string;
-  active: boolean;
-  country: string;
-  currency: string;
-  installment_terms: number[];
-}
-
-export interface OmisePaymentMethod {
-  currency: string;
-  supported_currencies: string[];
-  country_codes: string[];
-  installment_terms: number[];
-  banks: string[];
-}
-
-// ============================================================================
-// Chain
-// ============================================================================
-
-export interface OmiseChain extends OmiseBaseObject {
-  object: 'chain';
-  revoked: boolean;
-  email: string;
-  key: string;
-  webhook_uri?: string;
-  metadata?: OmiseMetadata;
-}
-
-export interface OmiseChainRevision extends OmiseBaseObject {
-  object: 'chain_revision';
-  chain: string;
-  key: string;
-  revoked: boolean;
-  revoked_at?: string;
-  metadata?: OmiseMetadata;
-}
 
 // ============================================================================
 // Request Type Definitions
@@ -462,18 +399,6 @@ export interface CreateRefundRequest {
   metadata?: OmiseMetadata;
 }
 
-export interface CreateLinkRequest {
-  amount: number;
-  currency: string;
-  description?: string;
-  title?: string;
-  multiple?: boolean;
-  used?: boolean;
-  charges?: any[];
-  payment_uri?: string;
-  metadata?: OmiseMetadata;
-}
-
 export interface CreateSourceRequest {
   type: string;
   amount: number;
@@ -495,17 +420,6 @@ export interface CreateScheduleRequest {
     currency: string;
     description?: string;
   };
-  metadata?: OmiseMetadata;
-}
-
-export interface CreateChainRequest {
-  email?: string;
-  name?: string;
-  description?: string;
-  webhook_uri?: string;
-  steps?: any[];
-  rollback_steps?: any[];
-  timeout?: number;
   metadata?: OmiseMetadata;
 }
 
@@ -577,27 +491,6 @@ export interface OmiseDisputeSearchParams extends OmiseSearchParams {
 }
 
 // ============================================================================
-// Webhook Type Definitions
-// ============================================================================
-
-export interface OmiseWebhook {
-  object: 'webhook';
-  id: string;
-  livemode: boolean;
-  location: string;
-  url: string;
-  disabled: boolean;
-  created: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface OmiseWebhookEndpoint extends OmiseWebhook {
-  events: string[];
-  metadata?: OmiseMetadata;
-}
-
-// ============================================================================
 // Capability Type Definitions
 // ============================================================================
 
@@ -635,32 +528,4 @@ export interface OmiseCurrency {
   symbol: string;
   exponent: number;
   supported: boolean;
-}
-
-export interface CreateWebhookRequest {
-  url: string;
-  metadata?: OmiseMetadata;
-}
-
-export interface UpdateWebhookRequest {
-  url?: string;
-  disabled?: boolean;
-  metadata?: OmiseMetadata;
-}
-
-export interface CreateWebhookEndpointRequest {
-  url: string;
-  events: string[];
-  description?: string;
-  secret_key?: string;
-  metadata?: OmiseMetadata;
-}
-
-export interface UpdateWebhookEndpointRequest {
-  url?: string;
-  events?: string[];
-  disabled?: boolean;
-  description?: string;
-  secret_key?: string;
-  metadata?: OmiseMetadata;
 }

@@ -2,7 +2,7 @@
  * Omise API Client
  */
 
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
 import { 
   OmiseConfig, 
   OmiseCharge, 
@@ -14,7 +14,6 @@ import {
   OmiseListResponse
 } from '../types/omise.js';
 import { Logger } from './logger.js';
-import { RequestContext, ResponseContext } from '../types/mcp.js';
 
 // Extend Axios types to include custom metadata
 declare module 'axios' {
