@@ -103,7 +103,6 @@ describe('Logger', () => {
         enableRequestLogging: false,
         enableResponseLogging: false
       },
-,
       tools: {
         allowed: 'all'
       },
