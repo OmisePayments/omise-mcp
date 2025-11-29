@@ -3,6 +3,8 @@
  */
 
 import winston from 'winston';
+import path from 'path';
+import fs from 'fs';
 import { ServerConfig } from '../types/mcp.js';
 
 export class Logger {
@@ -27,39 +29,55 @@ export class Logger {
     );
 
     // File output (production environment)
+    // Note: For MCP stdio servers, file logging is optional since all output goes to stderr
     if (this.config.omise.environment === 'production') {
-      // Error log
-      transports.push(
-        new winston.transports.File({
-          filename: 'logs/error.log',
-          level: 'error',
-          format: this.getFileFormat(),
-          maxsize: 10 * 1024 * 1024, // 10MB
-          maxFiles: 5
-        })
-      );
+      // Ensure logs directory exists
+      const logsDir = path.resolve(process.cwd(), 'logs');
+      try {
+        if (!fs.existsSync(logsDir)) {
+          fs.mkdirSync(logsDir, { recursive: true });
+        }
+      } catch (error) {
+        // If we can't create logs directory, skip file logging
+        // This is fine for MCP stdio servers which use console/stderr
+        console.warn('Could not create logs directory, file logging disabled:', error);
+      }
 
-      // All logs
-      transports.push(
-        new winston.transports.File({
-          filename: 'logs/combined.log',
-          format: this.getFileFormat(),
-          maxsize: 50 * 1024 * 1024, // 50MB
-          maxFiles: 10
-        })
-      );
-
-      // Access log
-      if (this.config.logging.enableRequestLogging) {
+      // Only add file transports if logs directory exists
+      if (fs.existsSync(logsDir)) {
+        // Error log
         transports.push(
           new winston.transports.File({
-            filename: 'logs/access.log',
-            level: 'info',
+            filename: path.join(logsDir, 'error.log'),
+            level: 'error',
             format: this.getFileFormat(),
-            maxsize: 100 * 1024 * 1024, // 100MB
+            maxsize: 10 * 1024 * 1024, // 10MB
             maxFiles: 5
           })
         );
+
+        // All logs
+        transports.push(
+          new winston.transports.File({
+            filename: path.join(logsDir, 'combined.log'),
+            format: this.getFileFormat(),
+            maxsize: 50 * 1024 * 1024, // 50MB
+            maxFiles: 10
+          })
+        );
+
+        // Access log
+        if (this.config.logging.enableRequestLogging) {
+          transports.push(
+            new winston.transports.File({
+              filename: path.join(logsDir, 'access.log'),
+              level: 'info',
+              format: this.getFileFormat(),
+              maxsize: 100 * 1024 * 1024, // 100MB
+              maxFiles: 5
+            })
+          );
+        }
       }
     }
 
