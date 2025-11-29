@@ -40,16 +40,16 @@
 
 ## 📋 Supported APIs
 
-| Category | Features | Tool Count | Documentation |
-|---------|----------|------------|---------------|
-| **Payment** | Charges (7), Sources (2) | 9 | [Omise Charges API](https://www.omise.co/charges-api) |
-| **Customer** | Customer & Card Management | 9 | [Omise Customers API](https://www.omise.co/customers-api) |
-| **Transfer** | Transfers (5) & Recipients (6) | 11 | [Omise Transfers API](https://www.omise.co/transfers-api) |
-| **Refund** | Refund Processing | 3 | [Omise Refunds API](https://www.omise.co/refunds-api) |
-| **Dispute** | Chargeback & Document Management | 8 | [Omise Disputes API](https://www.omise.co/disputes-api) |
-| **Schedule** | Recurring Payments | 5 | [Omise Schedules API](https://www.omise.co/schedules-api) |
-| **Event** | Event Management | 2 | [Omise Events API](https://www.omise.co/events-api) |
-| **Capability** | Feature Verification | 1 | [Omise Capabilities API](https://www.omise.co/capabilities-api) |
+| Category | Features | Tool Count | Documentation                                                 |
+|---------|----------|------------|---------------------------------------------------------------|
+| **Payment** | Charges (7), Sources (2) | 9 | [Omise Charges API](https://docs.omise.co/charges-api)        |
+| **Customer** | Customer & Card Management | 9 | [Omise Customers API](https://docs.omise.co/customers-api)     |
+| **Transfer** | Transfers (5) & Recipients (6) | 11 | [Omise Transfers API](https://docs.omise.co/transfers-api)     |
+| **Refund** | Refund Processing | 3 | [Omise Refunds API](https://docs.omise.co/refunds-api)         |
+| **Dispute** | Chargeback & Document Management | 8 | [Omise Disputes API](https://docs.omise.co/disputes-api)       |
+| **Schedule** | Recurring Payments | 5 | [Omise Schedules API](https://docs.omise.co/schedules-api)     |
+| **Event** | Event Management | 2 | [Omise Events API](https://docs.omise.co/events-api)           |
+| **Capability** | Feature Verification | 1 | [Omise Capabilities API](https://docs.omise.co/capability-api) |
 
 **Total: 48 tools** covering all active Omise Core API functionality
 
@@ -594,15 +594,15 @@ Retrieve customer information.
 
 ### Omise Official Documentation
 
-- [Omise API Documentation](https://www.omise.co/api-documentation)
-- [Omise Charges API](https://www.omise.co/charges-api)
-- [Omise Customers API](https://www.omise.co/customers-api)
-- [Omise Transfers API](https://www.omise.co/transfers-api)
-- [Omise Refunds API](https://www.omise.co/refunds-api)
-- [Omise Disputes API](https://www.omise.co/disputes-api)
-- [Omise Schedules API](https://www.omise.co/schedules-api)
-- [Omise Events API](https://www.omise.co/events-api)
-- [Omise Capabilities API](https://www.omise.co/capabilities-api)
+- [Omise API Documentation](https://docs.omise.co/)
+- [Omise Charges API](https://docs.omise.co/charges-api)
+- [Omise Customers API](https://docs.omise.co/customers-api)
+- [Omise Transfers API](https://docs.omise.co/transfers-api)
+- [Omise Refunds API](https://docs.omise.co/refunds-api)
+- [Omise Disputes API](https://docs.omise.co/disputes-api)
+- [Omise Schedules API](https://docs.omise.co/schedules-api)
+- [Omise Events API](https://docs.omise.co/events-api)
+- [Omise Capabilities API](https://docs.omise.co/capability-api)
 
 ### Technical Documentation
 
@@ -614,7 +614,6 @@ Retrieve customer information.
 
 - **GitHub Issues**: [Bug reports and feature requests](https://github.com/omise/omise-mcp/issues)
 - **Omise Support**: [Omise official support](https://www.omise.co/support)
-- **Community**: [Developer community](https://github.com/omise/omise-mcp/discussions)
 
 ## 📄 License
 
